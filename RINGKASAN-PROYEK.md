@@ -1,4 +1,4 @@
-# buahmurah.id — Ringkasan Proyek (v3)
+# buahmurah.id — Ringkasan Proyek (v4)
 
 > Berkas ini dibuat untuk dilampirkan ke percakapan Claude yang baru supaya pengerjaan
 > bisa dilanjutkan tanpa mengulang penjelasan dari nol. Lampirkan file ini bersama
@@ -65,13 +65,14 @@ Ganti kata sandi lewat menu **Akun saya** setelah login pertama.
 | Modul | Kolom |
 |---|---|
 | Cashflow | Nomor, Tanggal, Keterangan, Debit, Kredit, Saldo, Bukti Transaksi |
-| Kulakan | Nomor, Tanggal, Keterangan, Debit, Kredit, Saldo, Bukti Transaksi |
+| Kulakan | Nomor, Tanggal, Keterangan, Jumlah, Satuan, Harga, Total, Bukti Transaksi — **tanpa debit/kredit**, karena kulakan hanya pengeluaran (revisi pemilik) |
 | Gaji | Nomor, Bulan, Absensi/Total Hari, Kasbon, Total |
 | Stock Opname | Nomor, Tanggal, Keterangan, Kondisi Baik/Rusak |
 | Stock Buah | Jenis Buah, Jumlah, Satuan |
 
-Kolom **Saldo** tidak disimpan di database, dihitung berjalan di layar
-(`saldo += debit - kredit`, diurutkan berdasarkan Nomor).
+Kolom **Saldo** pada Cashflow tidak disimpan di database, dihitung berjalan di layar
+(`saldo += debit - kredit`, diurutkan berdasarkan Nomor). Pada Kulakan yang dihitung adalah
+`total = jumlah × harga` per baris, dengan total belanja di baris kaki tabel.
 
 ---
 
@@ -114,12 +115,11 @@ Struktur folder di hosting harus **persis seperti di atas** — `index.html` mem
 | Tabel | Isi | Siapa yang boleh |
 |---|---|---|
 | `profiles` | id, email, nama, jabatan, role, hak_akses (text[]), aktif | baca diri sendiri; manajemen baca & ubah semua |
-| `jenis_buah` | nama, satuan, harga, aktif | semua baca; manajemen ubah |
-| `stock_buah` | jenis_buah, jumlah, satuan | semua baca; manajemen ubah |
+| `stock_buah` | jenis_buah, jumlah, satuan, harga, aktif | semua baca; manajemen ubah. **Satu-satunya master buah** — daftar pilihan di layar kasir dibaca dari sini |
 | `penjualan` | tanggal, jenis_buah, qty, satuan, harga, total (generated), pembayaran, bukti_url, user_id | kasir hanya miliknya; manajemen semua |
 | `pengeluaran` | tanggal, keterangan, nominal, user_id | sama seperti penjualan |
 | `cashflow` | nomor, tanggal, keterangan, debit, kredit, bukti_url | khusus manajemen |
-| `kulakan` | sama seperti cashflow | khusus manajemen |
+| `kulakan` | nomor, tanggal, keterangan, jumlah, satuan, harga, bukti_url | khusus manajemen |
 | `gaji` | nomor, nama, bulan, absensi, total_hari, kasbon, total | khusus manajemen |
 | `stock_opname` | nomor, tanggal, keterangan, kondisi | khusus manajemen |
 | `notifikasi` | judul, pesan, jenis, nominal, untuk_role, ref_tabel, ref_id, dari_nama, dibaca | dibaca oleh role tujuan saja |
@@ -169,11 +169,28 @@ role. Menu bertanda `khususManajemen` selalu disembunyikan dari akun kasir.
 
 **Penjualan.** Pilih buah → harga terisi otomatis, stepper +/− 0,5 Kg, total besar di bar
 kuning. Cash atau Transfer wajib dipilih; kalau belum, tombol simpan menolak dan kotak
-pilihan diberi garis merah. Memilih Transfer memunculkan unggah bukti (opsional,
-`capture="environment"` agar kamera HP langsung terbuka).
+pilihan diberi garis merah. Memilih Transfer memunculkan kotak bukti dengan dua tombol:
+**Ambil foto** (`capture="environment"`, kamera langsung terbuka) dan **Pilih berkas**
+(galeri atau berkas). Keduanya opsional dan saling meniadakan.
 
-**Pengeluaran, Riwayat, Cashflow, Kulakan, Gaji, Stock Opname, Stock Buah, Data kasir**
-— semua sesuai tabel spesifikasi, dengan nomor otomatis, saldo berjalan, dan unggah bukti.
+**Pengeluaran, Riwayat, Cashflow, Gaji, Stock Opname, Data kasir** — sesuai tabel
+spesifikasi, dengan nomor otomatis, saldo berjalan, dan unggah bukti.
+
+**Kulakan** memakai kolom Jumlah, Satuan, dan Harga; total per baris dan total belanja
+dihitung di layar. Keterangan punya `datalist` berisi nama buah dari Stock Buah, dan
+memilih salah satunya ikut mengisi satuannya.
+
+**Stock Buah** adalah master tunggal: jumlah, satuan, harga jual, dan saklar "tampil di
+kasir" semuanya bisa diedit langsung di tabel. Layar kasir membaca daftar buah dari sini,
+lengkap dengan sisa stok di tiap pilihan — jadi tidak ada lagi buah yang muncul di kasir
+tapi sudah dihapus manajemen.
+
+**Header dan navigasi.** Setiap halaman punya header berisi sapaan dengan nama yang login,
+tanggal dan jam berjalan (diperbarui tiap detik), lonceng notifikasi, dan avatar bundar
+berisi inisial. Avatar diklik memunculkan pop-up profil dengan tombol Akun saya dan Keluar.
+Panel kiri punya header berisi logo dan nama aplikasi. Di HP, bilah bawah hanya memuat
+lima tombol: empat menu utama sesuai role plus **Lainnya**, yang membuka sisanya dalam
+bentuk kisi. Semua ikon memakai SVG garis tipis, bukan emoji.
 
 **Pengguna** (khusus manajemen). Tambah akun, ubah nama/jabatan/email/role/hak akses,
 ganti kata sandi, hapus akun.
@@ -195,6 +212,12 @@ memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke do
 - Semua nama fungsi dan variabel berbahasa Indonesia.
 - Pola layar: `layarX()` merender HTML ke `#layar`, lalu `muatX()` mengisi tabelnya.
   Setelah render selalu panggil `siapkanUang()`.
+- Ikon: `ikon(nama, ukuran)` mengambil path dari `GAMBAR_IKON` dan membungkusnya jadi SVG
+  `stroke="currentColor"`. Menambah menu berarti menambah satu entri di `SEMUA_MENU`
+  (dengan `pendek` untuk label bilah bawah) dan satu path di `GAMBAR_IKON`.
+- Bukti transaksi: `kotakBukti(pre)` merender tombol kamera + berkas, `pasangBukti(pre)`
+  mengikatnya, `unggahBukti(pre, folder)` mengunggah ke Storage lalu mengembalikan `{url}`
+  atau `{error}`, `resetBukti(pre)` mengosongkan.
 - Fungsi bantu: `$()`, `rp()`, `angka()`, `tglIndo()`, `hariIni()`, `bulanIni()`,
   `aman()` untuk escape HTML, `toast()`, `pasangHapus(tabel, muatUlang)`, dan
   `bukaModal(judul, isiHTML, saatSimpan, labelTombol)` — kalau `saatSimpan` diisi `null`,
@@ -206,7 +229,7 @@ memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke do
 - Font Plus Jakarta Sans, angka memakai `font-variant-numeric: tabular-nums`.
 - Sidebar di layar lebar, tab bawah di layar ≤960px, padding `env(safe-area-inset-*)`.
 - **Naikkan angka `VERSI` di `sw.js` setiap kali `index.html` diubah**, kalau tidak HP
-  akan tetap membuka versi lama dari cache. Sekarang bernilai `buahmurah-v2`.
+  akan tetap membuka versi lama dari cache. Sekarang bernilai `buahmurah-v3`.
 
 ---
 
@@ -214,11 +237,10 @@ memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke do
 
 1. **Web Push sungguhan** supaya notifikasi tetap masuk saat aplikasi tertutup — perlu
    kunci VAPID, tabel langganan push, dan pengirim di Edge Function.
-2. **Stok tidak berkurang otomatis.** Penjualan belum memotong `stock_buah`. Sengaja
-   dipisah karena kulakan sering masuk per peti, bukan per Kg.
+2. **Stok tidak berkurang otomatis.** Penjualan belum memotong `stock_buah`, dan kulakan
+   belum menambahnya. Sengaja dipisah karena kulakan sering masuk per peti sementara
+   penjualan per Kg, jadi perlu faktor konversi dulu.
 3. **Laporan dan ekspor.** Belum ada rekap per periode, grafik, atau unduh Excel/PDF.
-4. **Master jenis buah belum ada layarnya.** Harganya masih harus diubah dari dashboard
-   Supabase.
 5. **Edit baris pembukuan.** Cashflow, kulakan, gaji, dan opname hanya bisa ditambah dan
    dihapus, belum bisa diedit.
 6. **Kolom `profiles.aktif`** sudah ada tapi belum dipakai untuk menonaktifkan akun.

@@ -1,5 +1,5 @@
 -- =====================================================================
--- buahmurah.id — Skema Supabase v3
+-- buahmurah.id — Skema Supabase v4
 -- Project: https://uuorhkhpubkvsilsybvw.supabase.co
 --
 -- Jalankan SELURUH isi berkas ini di Supabase Dashboard > SQL Editor > Run.
@@ -161,16 +161,9 @@ drop function public.buat_akun_awal(text, text, text, text, text);
 --   select email, nama, jabatan, role from public.profiles order by role;
 
 -- ---------------------------------------------------------------------
--- 4. MASTER DATA
+-- 4. MASTER BUAH — satu tabel untuk stok sekaligus daftar pilihan kasir
+--    (v4: tabel jenis_buah dihapus supaya kasir dan manajemen tidak beda data)
 -- ---------------------------------------------------------------------
-create table if not exists public.jenis_buah (
-  id     bigint generated always as identity primary key,
-  nama   text not null unique,
-  satuan text not null default 'Kg',
-  harga  numeric(14,2) not null default 0,
-  aktif  boolean not null default true
-);
-
 create table if not exists public.stock_buah (
   id         bigint generated always as identity primary key,
   jenis_buah text not null,
@@ -178,6 +171,29 @@ create table if not exists public.stock_buah (
   satuan     text not null default 'Kg',
   updated_at timestamptz not null default now()
 );
+
+alter table public.stock_buah add column if not exists harga numeric(14,2) not null default 0;
+alter table public.stock_buah add column if not exists aktif boolean not null default true;
+
+-- Pindahkan harga dari tabel lama (kalau masih ada), lalu buang tabelnya.
+do $$
+begin
+  if to_regclass('public.jenis_buah') is not null then
+    update public.stock_buah s
+    set harga = j.harga
+    from public.jenis_buah j
+    where s.jenis_buah = j.nama and s.harga = 0;
+
+    drop table public.jenis_buah cascade;
+  end if;
+end $$;
+
+-- Satu nama buah cukup satu baris: buang kembaran dulu, baru dikunci.
+delete from public.stock_buah a
+using public.stock_buah b
+where a.jenis_buah = b.jenis_buah and a.id > b.id;
+
+create unique index if not exists stock_buah_nama_uniq on public.stock_buah (jenis_buah);
 
 -- ---------------------------------------------------------------------
 -- 5. TRANSAKSI KASIR
@@ -225,16 +241,34 @@ create table if not exists public.cashflow (
   created_at timestamptz not null default now()
 );
 
+-- Kulakan hanya berisi pengeluaran belanja, jadi tidak memakai debit/kredit.
 create table if not exists public.kulakan (
   id         bigint generated always as identity primary key,
   nomor      integer not null default 1,
   tanggal    date not null default current_date,
   keterangan text not null default '',
-  debit      numeric(14,2) not null default 0,
-  kredit     numeric(14,2) not null default 0,
   bukti_url  text,
   created_at timestamptz not null default now()
 );
+
+alter table public.kulakan add column if not exists jumlah numeric(14,2) not null default 0;
+alter table public.kulakan add column if not exists satuan text not null default 'Kg';
+alter table public.kulakan add column if not exists harga  numeric(14,2) not null default 0;
+
+-- Data lama: nilai kredit dipindah jadi harga, lalu kolom debit/kredit dibuang.
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+             where table_schema='public' and table_name='kulakan' and column_name='kredit') then
+    update public.kulakan
+    set jumlah = case when jumlah = 0 then 1 else jumlah end,
+        harga  = case when harga = 0 then kredit else harga end
+    where kredit > 0;
+
+    alter table public.kulakan drop column kredit;
+    alter table public.kulakan drop column debit;
+  end if;
+end $$;
 
 create table if not exists public.gaji (
   id         bigint generated always as identity primary key,
@@ -333,7 +367,6 @@ end $$;
 -- 8. ROW LEVEL SECURITY
 -- ---------------------------------------------------------------------
 alter table public.profiles     enable row level security;
-alter table public.jenis_buah   enable row level security;
 alter table public.stock_buah   enable row level security;
 alter table public.penjualan    enable row level security;
 alter table public.pengeluaran  enable row level security;
@@ -355,12 +388,6 @@ create policy profiles_tambah on public.profiles
 drop policy if exists profiles_hapus on public.profiles;
 create policy profiles_hapus on public.profiles
   for delete to authenticated using (public.is_manajemen() and id <> auth.uid());
-
-drop policy if exists buah_read on public.jenis_buah;
-create policy buah_read on public.jenis_buah for select to authenticated using (true);
-drop policy if exists buah_write on public.jenis_buah;
-create policy buah_write on public.jenis_buah
-  for all to authenticated using (public.is_manajemen()) with check (public.is_manajemen());
 
 drop policy if exists stok_read on public.stock_buah;
 create policy stok_read on public.stock_buah for select to authenticated using (true);
@@ -431,19 +458,10 @@ create policy bukti_upload on storage.objects
   for insert to authenticated with check (bucket_id = 'bukti');
 
 -- ---------------------------------------------------------------------
--- 10. DATA AWAL
+-- 10. CATATAN
 -- ---------------------------------------------------------------------
-insert into public.jenis_buah (nama, satuan, harga) values
-  ('Apel Fuji','Kg',35000),
-  ('Jeruk Medan','Kg',28000),
-  ('Mangga Harum Manis','Kg',30000),
-  ('Semangka','Kg',12000),
-  ('Pisang Cavendish','Kg',22000),
-  ('Anggur Merah','Kg',75000),
-  ('Salak Pondoh','Kg',18000),
-  ('Pepaya California','Kg',15000)
-on conflict (nama) do nothing;
-
-insert into public.stock_buah (jenis_buah, jumlah, satuan)
-select j.nama, 0, j.satuan from public.jenis_buah j
-where not exists (select 1 from public.stock_buah s where s.jenis_buah = j.nama);
+-- Tidak ada data buah bawaan. Isi sendiri lewat menu Stock Buah di akun
+-- manajemen; daftar itulah yang muncul sebagai pilihan di layar kasir.
+--
+-- Cek isi daftar buah:
+--   select jenis_buah, jumlah, satuan, harga, aktif from public.stock_buah order by jenis_buah;

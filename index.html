@@ -95,15 +95,19 @@ label{display:block;font-size:13.5px;font-weight:600;margin-bottom:7px}
 #app{display:none;min-height:100dvh;grid-template-columns:238px 1fr}
 #app.tampil{display:grid}
 .sisi{background:var(--biru-tua);color:#fff;padding:22px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100dvh}
-.sisi-atas{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px 20px}
-.sisi .merek{font-size:22px}
+.sisi-kepala{display:flex;align-items:center;gap:11px;padding:2px 10px 22px}
+.sisi .merek{font-size:19px}
+.sisi-sub{font-size:11.5px;color:#7E9AC6;font-weight:600;margin-top:3px;letter-spacing:.01em}
+.logo-petak{
+  width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .menu{display:flex;flex-direction:column;gap:3px;overflow-y:auto}
 .menu button{
   display:flex;align-items:center;gap:11px;width:100%;text-align:left;
   padding:11px 12px;border-radius:10px;color:#B9CFF0;font-weight:600;font-size:14.5px;transition:.15s}
 .menu button:hover{background:rgba(255,255,255,.08);color:#fff}
 .menu button.aktif{background:var(--kuning);color:var(--biru-tua);font-weight:700}
-.menu .ikon{width:19px;text-align:center;font-size:15px}
+.menu .ikon{display:inline-flex;align-items:center;justify-content:center;width:20px;flex-shrink:0;opacity:.95}
 .menu .pisah{color:#7E9AC6;font-size:11.5px;font-weight:700;padding:16px 12px 7px;letter-spacing:.04em}
 .kartu-user{margin-top:auto;padding:13px 12px;background:rgba(255,255,255,.07);border-radius:11px}
 .kartu-user .nm{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -113,7 +117,41 @@ label{display:block;font-size:13.5px;font-weight:600;margin-bottom:7px}
 .pasang{background:var(--kuning)!important;color:var(--biru-tua)!important;display:none}
 .pasang.tampil{display:block}
 
-main{padding:30px 34px 90px;min-width:0}
+main{padding:0 34px 90px;min-width:0}
+
+/* ============ HEADER ============ */
+.kepala{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:20px 0 18px;border-bottom:1px solid var(--garis);margin-bottom:26px}
+.kepala-kiri{display:flex;align-items:center;gap:12px;min-width:0}
+.kepala .logo-petak{display:none;background:var(--biru-tua);width:38px;height:38px}
+.kepala-teks{min-width:0}
+.sapa{font-weight:800;font-size:17px;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jam{font-size:13px;color:var(--teks-lembut);margin-top:2px;font-variant-numeric:tabular-nums}
+.kepala-kanan{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.avatar{
+  width:42px;height:42px;border-radius:50%;background:var(--biru-tua);color:var(--kuning);
+  font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;
+  letter-spacing:.02em;transition:.15s;flex-shrink:0}
+.avatar:hover{background:var(--biru)}
+.avatar.besar{width:66px;height:66px;font-size:24px;margin:0 auto 14px}
+.profil-pop{text-align:center}
+.profil-pop .nm{font-weight:800;font-size:18px;letter-spacing:-.01em}
+.profil-pop .em{color:var(--teks-lembut);font-size:14px;margin-top:2px}
+
+/* ============ BUKTI: KAMERA / BERKAS ============ */
+.bukti{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tombol.kecil{padding:9px 13px;font-size:13.5px;display:inline-flex;align-items:center;gap:7px}
+.nama-bukti{font-size:13px;color:var(--teks-lembut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* ============ MENU LAINNYA ============ */
+.kisi-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.kisi-menu button{
+  display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:15px 14px;
+  border:1.5px solid var(--garis);border-radius:var(--r-kecil);font-weight:700;font-size:14px;
+  background:#fff;text-align:left;transition:.15s}
+.kisi-menu button:hover{border-color:var(--biru);background:var(--biru-kabut);color:var(--biru-tua)}
+.kisi-menu .ikon{color:var(--biru)}
 .judul{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
 .judul h2{font-size:25px;font-weight:800;letter-spacing:-.02em}
 .judul p{color:var(--teks-lembut);font-size:14.5px;margin-top:3px}
@@ -217,39 +255,42 @@ td.kanan,th.kanan{font-variant-numeric:tabular-nums}
 
 /* ============ HP ============ */
 .nav-bawah{display:none}
-.puncak{display:none}
 @media(max-width:960px){
   #app.tampil{grid-template-columns:1fr}
   .sisi{display:none}
-  main{padding:0 16px calc(96px + var(--aman-bawah))}
+  main{padding:0 16px calc(100px + var(--aman-bawah))}
   .kasir{grid-template-columns:1fr}
   .baris2{grid-template-columns:1fr}
   .judul h2{font-size:22px}
   .papan-isi{padding:18px}
   .kepala-papan{padding:14px 18px}
   .form-tambah{padding:16px 18px}
-  .puncak{
-    display:flex;align-items:center;justify-content:space-between;gap:10px;
-    background:var(--biru-tua);color:#fff;margin:0 -16px 20px;
-    padding:calc(14px + env(safe-area-inset-top)) 16px 14px;position:sticky;top:0;z-index:30}
-  .puncak .merek{font-size:18px}
-  .puncak .kanan-atas{display:flex;gap:14px;align-items:center}
-  .puncak button{color:var(--kuning);font-weight:700;font-size:13px}
+  .kepala{
+    position:sticky;top:0;z-index:30;background:var(--bg);margin:0 -16px 20px;
+    padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+  .kepala .logo-petak{display:flex;width:36px;height:36px;border-radius:11px}
+  .sapa{font-size:15.5px}
+  .jam{font-size:12px}
+  .lonceng,.avatar{width:38px;height:38px}
   .nav-bawah{
     display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--biru-tua);
-    padding:8px 6px calc(8px + var(--aman-bawah));gap:2px;overflow-x:auto}
+    padding:9px 8px calc(9px + var(--aman-bawah));gap:4px}
   .nav-bawah button{
-    flex:1 0 auto;min-width:70px;padding:8px 6px;border-radius:9px;color:#B9CFF0;
-    font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
-  .nav-bawah button .ikon{font-size:17px}
+    flex:1 1 0;min-width:0;padding:8px 4px;border-radius:10px;color:#B9CFF0;
+    font-size:10.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .nav-bawah button .lb{
+    width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
   .nav-bawah button.aktif{background:var(--kuning);color:var(--biru-tua)}
   .modal{max-height:92dvh}
   .modal-kaki{padding-bottom:calc(16px + var(--aman-bawah))}
 }
 
 /* ============ LONCENG NOTIFIKASI ============ */
-.lonceng{position:relative;display:none;font-size:19px;line-height:1;padding:6px;border-radius:9px;color:#fff}
-.lonceng:hover{background:rgba(255,255,255,.12)}
+.lonceng{
+  position:relative;display:none;align-items:center;justify-content:center;
+  width:42px;height:42px;border-radius:12px;color:var(--biru-tua);
+  background:#fff;border:1.5px solid var(--garis);transition:.15s;flex-shrink:0}
+.lonceng:hover{background:var(--biru-kabut);border-color:#C5DAFB}
 .lonceng .titik{
   position:absolute;top:-2px;right:-3px;min-width:18px;height:18px;padding:0 5px;
   background:var(--kuning);color:var(--biru-tua);border-radius:100px;
@@ -323,9 +364,12 @@ td.kanan,th.kanan{font-variant-numeric:tabular-nums}
 <!-- ================= APLIKASI ================= -->
 <div id="app">
   <aside class="sisi">
-    <div class="sisi-atas">
-      <div class="merek">buahmurah<span class="id">.id</span></div>
-      <button class="lonceng" aria-label="Notifikasi">🔔<span class="titik">0</span></button>
+    <div class="sisi-kepala">
+      <div class="logo-petak"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><circle cx="12" cy="14" r="7.2" fill="#FFC91D"/><path d="M12 7.2V4.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M12.8 5.6c1.5-1.5 3.6-1.4 4.5-1.1.2 1-.1 3-1.9 3.8-1.4.6-2.4-.4-2.6-1.3Z" fill="#2FA96B"/></svg></div>
+      <div>
+        <div class="merek">buahmurah<span class="id">.id</span></div>
+        <div class="sisi-sub">KASIR &amp; PEMBUKUAN</div>
+      </div>
     </div>
     <nav class="menu" id="menu"></nav>
     <div class="kartu-user">
@@ -336,14 +380,19 @@ td.kanan,th.kanan{font-variant-numeric:tabular-nums}
     </div>
   </aside>
   <main>
-    <div class="puncak">
-      <div class="merek">buahmurah<span class="id">.id</span></div>
-      <div class="kanan-atas">
-        <button class="lonceng" aria-label="Notifikasi">🔔<span class="titik">0</span></button>
-        <button class="pasang" id="btnPasangHp" style="background:none;padding:0">Pasang</button>
-        <button id="btnKeluarHp">Keluar</button>
+    <header class="kepala">
+      <div class="kepala-kiri">
+        <div class="logo-petak"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><circle cx="12" cy="14" r="7.2" fill="#FFC91D"/><path d="M12 7.2V4.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M12.8 5.6c1.5-1.5 3.6-1.4 4.5-1.1.2 1-.1 3-1.9 3.8-1.4.6-2.4-.4-2.6-1.3Z" fill="#2FA96B"/></svg></div>
+        <div class="kepala-teks">
+          <div class="sapa" id="sapaNama">—</div>
+          <div class="jam" id="jamSekarang">—</div>
+        </div>
       </div>
-    </div>
+      <div class="kepala-kanan">
+        <button class="lonceng" aria-label="Notifikasi"><span class="titik">0</span></button>
+        <button class="avatar" id="avatarUser" aria-label="Profil akun">—</button>
+      </div>
+    </header>
     <div id="layar"></div>
   </main>
   <nav class="nav-bawah" id="navBawah"></nav>
@@ -390,6 +439,36 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 /* =====================================================================
+   1b. PUSTAKA IKON — garis tipis, mengikuti warna teks
+   ===================================================================== */
+const GAMBAR_IKON = {
+  penjualan:    '<path d="M4.2 8h15.6l-1.15 11.1a2.1 2.1 0 0 1-2.1 1.9H7.45a2.1 2.1 0 0 1-2.1-1.9L4.2 8Z"/><path d="M9 8V6.1a3 3 0 0 1 6 0V8"/>',
+  pengeluaran:  '<circle cx="12" cy="12" r="8.8"/><path d="M12 7.6v8.2"/><path d="m8.7 12.5 3.3 3.3 3.3-3.3"/>',
+  riwayat:      '<circle cx="12" cy="12" r="8.8"/><path d="M12 6.8V12l3.4 2"/>',
+  ringkasan:    '<path d="M3.2 20.6h17.6"/><rect x="5" y="10.5" width="3.6" height="7" rx="1.2"/><rect x="10.2" y="5.5" width="3.6" height="12" rx="1.2"/><rect x="15.4" y="13.5" width="3.6" height="4" rx="1.2"/>',
+  cashflow:     '<path d="M3.2 8.6A2.6 2.6 0 0 1 5.8 6h11.4"/><rect x="3.2" y="8" width="17.6" height="11.2" rx="2.6"/><circle cx="16.6" cy="13.6" r="1.25"/>',
+  kulakan:      '<path d="M2.6 6.8h10.2v9.6H2.6z"/><path d="M12.8 10.2h3.9l3.7 3.4v2.8h-7.6z"/><circle cx="6.8" cy="18.2" r="1.9"/><circle cx="16.9" cy="18.2" r="1.9"/>',
+  gaji:         '<rect x="2.6" y="5" width="18.8" height="14" rx="2.6"/><circle cx="8.6" cy="10.8" r="2.1"/><path d="M5.1 16.2c.75-1.7 2-2.5 3.5-2.5s2.75.8 3.5 2.5"/><path d="M15 10h4M15 13.6h4"/>',
+  stock_opname: '<rect x="5" y="4.6" width="14" height="16" rx="2.6"/><path d="M9 4.6v-.7A1.9 1.9 0 0 1 10.9 2h2.2A1.9 1.9 0 0 1 15 3.9v.7"/><path d="m9.4 13.2 2 2 3.4-4"/>',
+  stock_buah:   '<path d="m12 2.9 8.6 4.6v9L12 21.1 3.4 16.5v-9L12 2.9Z"/><path d="m3.4 7.5 8.6 4.6 8.6-4.6"/><path d="M12 12.1v9"/>',
+  penjualan_m:  '<path d="m3.2 16.4 5.6-5.6 3.4 3.4L20.8 6"/><path d="M15.2 6h5.6v5.6"/>',
+  pengeluaran_m:'<path d="m3.2 7.6 5.6 5.6 3.4-3.4L20.8 18"/><path d="M15.2 18h5.6v-5.6"/>',
+  pengguna:     '<circle cx="9.6" cy="8.9" r="3.3"/><path d="M3.2 19.6c.9-3.3 3.4-5 6.4-5s5.5 1.7 6.4 5"/><path d="M16.6 6.2a3.1 3.1 0 0 1 0 5.6"/><path d="M18.4 19.6a8 8 0 0 0-1-3.2"/>',
+  profil:       '<circle cx="12" cy="12" r="8.8"/><circle cx="12" cy="10.1" r="3"/><path d="M6.3 18.6c1.2-2.2 3.3-3.3 5.7-3.3s4.5 1.1 5.7 3.3"/>',
+  lainnya:      '<rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2.1"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2.1"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="2.1"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="2.1"/>',
+  lonceng:      '<path d="M6.2 9.6a5.8 5.8 0 1 1 11.6 0c0 3.9 1.2 5.5 1.9 6.2H4.3c.7-.7 1.9-2.3 1.9-6.2Z"/><path d="M10 19a2 2 0 0 0 4 0"/>',
+  kamera:       '<path d="M3.4 8.6h3.1l1.6-2.3h7.8l1.6 2.3h3.1v10.1H3.4z"/><circle cx="12" cy="13.4" r="3.3"/>',
+  unggah:       '<path d="M12 15.6V4.8"/><path d="m7.8 9 4.2-4.2L16.2 9"/><path d="M4.2 15.4v2.6a2.2 2.2 0 0 0 2.2 2.2h11.2a2.2 2.2 0 0 0 2.2-2.2v-2.6"/>',
+  keluar:       '<path d="M14.6 16.4v1.9a2.2 2.2 0 0 1-2.2 2.2H6.1a2.2 2.2 0 0 1-2.2-2.2V5.7a2.2 2.2 0 0 1 2.2-2.2h6.3a2.2 2.2 0 0 1 2.2 2.2v1.9"/><path d="M9.6 12h10.5"/><path d="m16.8 8.7 3.3 3.3-3.3 3.3"/>'
+};
+function ikon(nama, ukuran = 20){
+  const isi = GAMBAR_IKON[nama] || GAMBAR_IKON.lainnya;
+  return `<svg viewBox="0 0 24 24" width="${ukuran}" height="${ukuran}" fill="none"
+    stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true">${isi}</svg>`;
+}
+
+/* =====================================================================
    2. UTILITAS
    ===================================================================== */
 const $ = s => document.querySelector(s);
@@ -428,6 +507,41 @@ function uang(sel){
   const el = typeof sel==="string" ? $(sel) : sel;
   if(!el) return 0;
   return Number(String(el.value).replace(/\D/g,"")) || 0;
+}
+
+/* ---- Bukti: ambil foto langsung atau pilih berkas ---- */
+function kotakBukti(pre, terima="image/*,application/pdf"){
+  return `<div class="bukti" id="${pre}Kotak">
+    <input type="file" id="${pre}Kamera" accept="image/*" capture="environment" hidden>
+    <input type="file" id="${pre}Berkas" accept="${terima}" hidden>
+    <button type="button" class="tombol garis kecil" data-buka="${pre}Kamera">${ikon("kamera",17)} Ambil foto</button>
+    <button type="button" class="tombol garis kecil" data-buka="${pre}Berkas">${ikon("unggah",17)} Pilih berkas</button>
+    <span class="nama-bukti" id="${pre}Nama">Belum ada berkas</span>
+  </div>`;
+}
+function pasangBukti(pre){
+  document.querySelectorAll(`#${pre}Kotak [data-buka]`).forEach(b =>
+    b.addEventListener("click", () => $("#"+b.dataset.buka).click()));
+  [[pre+"Kamera", pre+"Berkas"], [pre+"Berkas", pre+"Kamera"]].forEach(([ini, itu]) => {
+    $("#"+ini).addEventListener("change", () => {
+      if(!$("#"+ini).files[0]) return;
+      $("#"+itu).value = "";
+      $("#"+pre+"Nama").textContent = $("#"+ini).files[0].name;
+    });
+  });
+}
+const berkasBukti = pre => $("#"+pre+"Kamera").files[0] || $("#"+pre+"Berkas").files[0] || null;
+function resetBukti(pre){
+  $("#"+pre+"Kamera").value=""; $("#"+pre+"Berkas").value="";
+  $("#"+pre+"Nama").textContent="Belum ada berkas";
+}
+async function unggahBukti(pre, folder){
+  const berkas = berkasBukti(pre);
+  if(!berkas) return { url:null };
+  const path = `${folder}/${Date.now()}-${berkas.name.replace(/[^\w.\-]/g,"_")}`;
+  const { error } = await sb.storage.from("bukti").upload(path, berkas);
+  if(error) return { error:error.message };
+  return { url: sb.storage.from("bukti").getPublicUrl(path).data.publicUrl };
 }
 
 let jamToast;
@@ -505,6 +619,7 @@ $("#btnLupa").addEventListener("click", async () => {
 
 async function keluar(){
   hentikanNotifikasi();
+  clearInterval(jamDetik);
   await sb.auth.signOut();
   sesi=null; profil=null;
   $("#app").classList.remove("tampil");
@@ -513,7 +628,6 @@ async function keluar(){
   $("#pesanLogin").className="pesan";
 }
 $("#btnKeluar").addEventListener("click", keluar);
-$("#btnKeluarHp").addEventListener("click", keluar);
 
 async function mulaiSesi(s){
   sesi=s;
@@ -528,27 +642,97 @@ async function mulaiSesi(s){
   $("#userNama").textContent = profil.nama || s.user.email;
   $("#userRole").textContent = (profil.jabatan ? profil.jabatan+" · " : "") +
     (profil.role==="manajemen" ? "Manajemen" : "Kasir");
+  gambarKepala();
+  mulaiJam();
   bangunMenu();
   mulaiNotifikasi();
 }
+
+/* ---- Header: sapaan, jam berjalan, avatar inisial ---- */
+let jamDetik = null;
+
+function inisialNama(){
+  const sumber = (profil && profil.nama) || (sesi && sesi.user.email) || "?";
+  const kata = String(sumber).trim().split(/[\s.@_-]+/).filter(Boolean);
+  return ((kata[0]||"?")[0] + (kata[1] ? kata[1][0] : "")).toUpperCase();
+}
+
+function salam(){
+  const j = new Date().getHours();
+  if(j < 11) return "Selamat pagi";
+  if(j < 15) return "Selamat siang";
+  if(j < 18) return "Selamat sore";
+  return "Selamat malam";
+}
+
+function gambarKepala(){
+  if(!profil) return;
+  $("#sapaNama").textContent = salam() + ", " + (profil.nama || sesi.user.email);
+  $("#avatarUser").textContent = inisialNama();
+}
+
+function mulaiJam(){
+  const gambar = () => {
+    const d = new Date();
+    const el = $("#jamSekarang");
+    if(!el) return;
+    el.textContent =
+      d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) +
+      " · " + d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  };
+  gambar();
+  clearInterval(jamDetik);
+  jamDetik = setInterval(gambar, 1000);
+}
+
+/* ---- Pop-up profil dari avatar ---- */
+function bukaPopProfil(){
+  if(!profil) return;
+  const bergabung = profil.created_at
+    ? new Date(profil.created_at).toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"})
+    : "—";
+  bukaModal("Profil akun", `
+    <div class="profil-pop">
+      <div class="avatar besar">${inisialNama()}</div>
+      <div class="nm">${aman(profil.nama) || "—"}</div>
+      <div class="em">${aman(profil.email || sesi.user.email)}</div>
+      <div style="margin-top:12px">
+        <span class="lencana ${profil.role==="manajemen"?"mjm":"ksr"}">
+          ${profil.role==="manajemen" ? "Akun Manajemen" : "Akun Kasir"}</span>
+      </div>
+    </div>
+    <div class="kisi" style="margin-top:22px">
+      <div><label>Jabatan</label><div>${aman(profil.jabatan) || "—"}</div></div>
+      <div><label>Bergabung</label><div>${bergabung}</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px">
+      <button class="tombol biru kecil" id="popAkun">${ikon("profil",17)} Akun saya</button>
+      <button class="tombol garis kecil" id="popKeluar">${ikon("keluar",17)} Keluar</button>
+    </div>`, null);
+
+  $("#popAkun").addEventListener("click", () => { tutupModal(); buka("profil"); });
+  $("#popKeluar").addEventListener("click", () => { tutupModal(); keluar(); });
+}
+
+$("#avatarUser").addEventListener("click", bukaPopProfil);
 
 /* =====================================================================
    5. MENU & HAK AKSES
    ===================================================================== */
 const SEMUA_MENU = {
-  penjualan:     {label:"Penjualan",        ikon:"🍎", grup:"Kasir"},
-  pengeluaran:   {label:"Pengeluaran",      ikon:"💸", grup:"Kasir"},
-  riwayat:       {label:"Riwayat",          ikon:"🧾", grup:"Kasir"},
-  ringkasan:     {label:"Ringkasan",        ikon:"📊", grup:"Manajemen"},
-  cashflow:      {label:"Cashflow",         ikon:"💰", grup:"Pembukuan"},
-  kulakan:       {label:"Kulakan",          ikon:"🚚", grup:"Pembukuan"},
-  gaji:          {label:"Gaji",             ikon:"👤", grup:"Pembukuan"},
-  stock_opname:  {label:"Stock Opname",     ikon:"📋", grup:"Gudang"},
-  stock_buah:    {label:"Stock Buah",       ikon:"🍇", grup:"Gudang"},
-  penjualan_m:   {label:"Data Penjualan",   ikon:"📈", grup:"Data kasir"},
-  pengeluaran_m: {label:"Data Pengeluaran", ikon:"📉", grup:"Data kasir"},
-  pengguna:      {label:"Pengguna",         ikon:"👥", grup:"Pengaturan", khususManajemen:true},
-  profil:        {label:"Akun saya",        ikon:"⚙️", grup:"Pengaturan"}
+  penjualan:     {label:"Penjualan",        pendek:"Jual",     grup:"Kasir"},
+  pengeluaran:   {label:"Pengeluaran",      pendek:"Keluar",   grup:"Kasir"},
+  riwayat:       {label:"Riwayat",          pendek:"Riwayat",  grup:"Kasir"},
+  ringkasan:     {label:"Ringkasan",        pendek:"Ringkas",  grup:"Manajemen"},
+  cashflow:      {label:"Cashflow",         pendek:"Cashflow", grup:"Pembukuan"},
+  kulakan:       {label:"Kulakan",          pendek:"Kulakan",  grup:"Pembukuan"},
+  gaji:          {label:"Gaji",             pendek:"Gaji",     grup:"Pembukuan"},
+  stock_opname:  {label:"Stock Opname",     pendek:"Opname",   grup:"Gudang"},
+  stock_buah:    {label:"Stock Buah",       pendek:"Stok",     grup:"Gudang"},
+  penjualan_m:   {label:"Data Penjualan",   pendek:"Penjualan",grup:"Data kasir"},
+  pengeluaran_m: {label:"Data Pengeluaran", pendek:"Keluar",   grup:"Data kasir"},
+  pengguna:      {label:"Pengguna",         pendek:"Pengguna", grup:"Pengaturan", khususManajemen:true},
+  profil:        {label:"Akun saya",        pendek:"Akun",     grup:"Pengaturan"}
 };
 const URUTAN = Object.keys(SEMUA_MENU);
 const BAWAAN = {
@@ -565,31 +749,65 @@ function menuSaya(){
   return daftar.length ? daftar : ["profil"];
 }
 
+/* Menu yang diutamakan di bilah bawah HP */
+const UTAMA_HP = {
+  kasir:     ["penjualan","pengeluaran","riwayat","profil"],
+  manajemen: ["ringkasan","cashflow","kulakan","penjualan_m"]
+};
+let menuBar = [], menuSisa = [];
+
 function bangunMenu(){
   const daftar = menuSaya();
+
   let grupTerakhir=null;
   $("#menu").innerHTML = daftar.map(id => {
     const m=SEMUA_MENU[id];
     const kepala = m.grup!==grupTerakhir ? `<div class="pisah">${m.grup}</div>` : "";
     grupTerakhir=m.grup;
-    return kepala + `<button data-hal="${id}"><span class="ikon">${m.ikon}</span>${m.label}</button>`;
+    return kepala + `<button data-hal="${id}"><span class="ikon">${ikon(id,19)}</span>${m.label}</button>`;
   }).join("");
-  $("#navBawah").innerHTML = daftar.map(id =>
-    `<button data-hal="${id}"><span class="ikon">${SEMUA_MENU[id].ikon}</span>${SEMUA_MENU[id].label}</button>`).join("");
+
+  // Bilah bawah HP: maksimal 5 tombol. Lebih dari itu masuk ke Lainnya.
+  const perluLainnya = daftar.length > 5;
+  if(perluLainnya){
+    menuBar = (UTAMA_HP[profil.role]||[]).filter(id => daftar.includes(id)).slice(0,4);
+    for(const id of daftar){ if(menuBar.length>=4) break; if(!menuBar.includes(id)) menuBar.push(id); }
+  } else {
+    menuBar = daftar.slice(0,5);
+  }
+  menuSisa = daftar.filter(id => !menuBar.includes(id));
+
+  $("#navBawah").innerHTML =
+    menuBar.map(id => `<button data-hal="${id}">${ikon(id,21)}<span class="lb">${SEMUA_MENU[id].pendek}</span></button>`).join("") +
+    (perluLainnya ? `<button id="btnLainnya">${ikon("lainnya",21)}<span class="lb">Lainnya</span></button>` : "");
+
   document.querySelectorAll("[data-hal]").forEach(b => b.addEventListener("click", () => buka(b.dataset.hal)));
+  const bl = $("#btnLainnya");
+  if(bl) bl.addEventListener("click", bukaMenuLainnya);
 
   const diminta = new URLSearchParams(location.search).get("hal");
   buka(daftar.includes(diminta) ? diminta : daftar[0]);
 }
 
+function bukaMenuLainnya(){
+  bukaModal("Menu lainnya", `<div class="kisi-menu">` + menuSisa.map(id =>
+    `<button data-lain="${id}"><span class="ikon">${ikon(id,22)}</span>${SEMUA_MENU[id].label}</button>`
+  ).join("") + `</div>`, null);
+  document.querySelectorAll("[data-lain]").forEach(b => b.addEventListener("click", () => {
+    tutupModal(); buka(b.dataset.lain);
+  }));
+}
+
 function buka(id){
   halaman = id;
   document.querySelectorAll("[data-hal]").forEach(b => b.classList.toggle("aktif", b.dataset.hal===id));
+  const bl = $("#btnLainnya");
+  if(bl) bl.classList.toggle("aktif", !menuBar.includes(id));
   $("#layar").innerHTML = `<div class="memuat">Memuat…</div>`;
   window.scrollTo({top:0});
   const peta = {
     penjualan:layarPenjualan, pengeluaran:layarPengeluaran, riwayat:layarRiwayat,
-    ringkasan:layarRingkasan, cashflow:()=>layarBuku("cashflow"), kulakan:()=>layarBuku("kulakan"),
+    ringkasan:layarRingkasan, cashflow:layarCashflow, kulakan:layarKulakan,
     gaji:layarGaji, stock_opname:layarOpname, stock_buah:layarStokBuah,
     penjualan_m:()=>layarDataKasir("penjualan"), pengeluaran_m:()=>layarDataKasir("pengeluaran"),
     pengguna:layarPengguna, profil:layarProfil
@@ -606,9 +824,11 @@ const kosong = (t,s) => `<div class="kosong"><strong>${t}</strong>${s}</div>`;
 let bayarTerpilih = null;
 
 async function layarPenjualan(){
-  const { data:buah } = await sb.from("jenis_buah").select("*").eq("aktif",true).order("nama");
+  const { data:buah } = await sb.from("stock_buah").select("*").eq("aktif",true).order("jenis_buah");
   const pilihan = (buah||[]).map(b =>
-    `<option value="${aman(b.nama)}" data-harga="${b.harga}" data-satuan="${aman(b.satuan)}">${aman(b.nama)}</option>`).join("");
+    `<option value="${aman(b.jenis_buah)}" data-harga="${b.harga||0}" data-satuan="${aman(b.satuan)}"
+      >${aman(b.jenis_buah)} — sisa ${angka(b.jumlah)} ${aman(b.satuan)}</option>`).join("");
+  const adaBuah = (buah||[]).length > 0;
   bayarTerpilih = null;
 
   $("#layar").innerHTML = judul("Penjualan", "Catat setiap buah yang terjual hari ini.") + `
@@ -617,7 +837,7 @@ async function layarPenjualan(){
       <div class="grup">
         <label for="fBuah">Jenis buah</label>
         <select id="fBuah" class="isian" style="height:48px">
-          <option value="">— pilih buah —</option>${pilihan}
+          <option value="">${adaBuah ? "— pilih buah —" : "— belum ada buah di daftar stok —"}</option>${pilihan}
         </select>
       </div>
       <div class="baris2">
@@ -649,9 +869,9 @@ async function layarPenjualan(){
           <button type="button" data-bayar="Transfer">Transfer</button>
         </div>
         <div class="kotak-transfer" id="kotakTransfer">
-          <label for="fBukti">Bukti transfer</label>
-          <input id="fBukti" class="isian" type="file" accept="image/*" capture="environment" style="padding:9px;background:#fff">
-          <div class="ket">Boleh dilewati. Foto struk atau tangkapan layar m-banking bisa diunggah nanti.</div>
+          <label>Bukti transfer</label>
+          ${kotakBukti("jual","image/*")}
+          <div class="ket">Boleh dilewati. Ambil foto struk langsung, atau pilih tangkapan layar m-banking dari galeri.</div>
         </div>
       </div>
       <button class="tombol kuning" id="btnJual" style="width:100%;padding:15px;font-size:16px">Simpan penjualan</button>
@@ -664,6 +884,7 @@ async function layarPenjualan(){
     </div>
   </div>`;
   siapkanUang();
+  pasangBukti("jual");
 
   const fBuah=$("#fBuah"), fQty=$("#fQty"), fHarga=$("#fHarga");
   const hitung = () => $("#fTotal").textContent = rp((+fQty.value||0)*uang(fHarga));
@@ -695,12 +916,10 @@ async function layarPenjualan(){
     const b=$("#btnJual"); b.disabled=true; b.textContent="Menyimpan…";
 
     let bukti=null;
-    const berkas=$("#fBukti").files[0];
-    if(bayarTerpilih==="Transfer" && berkas){
-      const path=`penjualan/${Date.now()}-${berkas.name.replace(/[^\w.\-]/g,"_")}`;
-      const { error:eUp } = await sb.storage.from("bukti").upload(path, berkas);
-      if(eUp){ b.disabled=false; b.textContent="Simpan penjualan"; return toast("Bukti gagal diunggah: "+eUp.message,"gagal"); }
-      bukti = sb.storage.from("bukti").getPublicUrl(path).data.publicUrl;
+    if(bayarTerpilih==="Transfer"){
+      const hasil = await unggahBukti("jual","penjualan");
+      if(hasil.error){ b.disabled=false; b.textContent="Simpan penjualan"; return toast("Bukti gagal diunggah: "+hasil.error,"gagal"); }
+      bukti = hasil.url;
     }
 
     const { error } = await sb.from("penjualan").insert({
@@ -712,7 +931,7 @@ async function layarPenjualan(){
     if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
 
     toast("Penjualan tersimpan");
-    fBuah.value=""; fQty.value=1; fHarga.value="0"; $("#fSatuan").textContent="Kg"; $("#fBukti").value="";
+    fBuah.value=""; fQty.value=1; fHarga.value="0"; $("#fSatuan").textContent="Kg"; resetBukti("jual");
     bayarTerpilih=null;
     document.querySelectorAll("[data-bayar]").forEach(x=>x.classList.remove("aktif"));
     $("#kotakTransfer").classList.remove("tampil");
@@ -835,14 +1054,14 @@ async function layarRingkasan(){
     sb.from("penjualan").select("total,pembayaran").gte("tanggal",b+"-01"),
     sb.from("pengeluaran").select("nominal").gte("tanggal",b+"-01"),
     sb.from("cashflow").select("debit,kredit"),
-    sb.from("kulakan").select("debit,kredit"),
+    sb.from("kulakan").select("jumlah,harga"),
     sb.from("stock_buah").select("jumlah")
   ]);
   const totJual=(j.data||[]).reduce((a,x)=>a+Number(x.total||0),0);
   const tunai=(j.data||[]).filter(x=>x.pembayaran==="Cash").reduce((a,x)=>a+Number(x.total||0),0);
   const totKel=(k.data||[]).reduce((a,x)=>a+Number(x.nominal||0),0);
   const saldoCf=(cf.data||[]).reduce((a,x)=>a+Number(x.debit||0)-Number(x.kredit||0),0);
-  const saldoKl=(kl.data||[]).reduce((a,x)=>a+Number(x.debit||0)-Number(x.kredit||0),0);
+  const belanjaKl=(kl.data||[]).reduce((a,x)=>a+Number(x.jumlah||0)*Number(x.harga||0),0);
   const totStok=(st.data||[]).reduce((a,x)=>a+Number(x.jumlah||0),0);
   const namaBulan=new Date(b+"-01T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"});
 
@@ -853,7 +1072,7 @@ async function layarRingkasan(){
     <div class="stat"><div class="lb">Diterima transfer</div><div class="ag num">${rp(totJual-tunai)}</div></div>
     <div class="stat"><div class="lb">Pengeluaran kasir</div><div class="ag num">${rp(totKel)}</div></div>
     <div class="stat"><div class="lb">Saldo cashflow</div><div class="ag num">${rp(saldoCf)}</div></div>
-    <div class="stat"><div class="lb">Saldo kulakan</div><div class="ag num">${rp(saldoKl)}</div></div>
+    <div class="stat"><div class="lb">Belanja kulakan</div><div class="ag num">${rp(belanjaKl)}</div></div>
     <div class="stat"><div class="lb">Total stok tercatat</div><div class="ag num">${angka(totStok)} Kg</div></div>
   </div>
   <div class="papan" style="margin-top:22px"><div class="papan-isi">
@@ -866,16 +1085,13 @@ async function layarRingkasan(){
 /* =====================================================================
    10. MANAJEMEN — CASHFLOW & KULAKAN
    ===================================================================== */
-async function layarBuku(tabel){
-  const nama = tabel==="cashflow" ? "Cashflow" : "Kulakan";
-  const ket  = tabel==="cashflow"
-    ? "Semua uang masuk dan keluar toko. Debit menambah saldo, kredit mengurangi."
-    : "Belanja buah ke supplier. Debit untuk pengembalian, kredit untuk pembelian.";
-
-  $("#layar").innerHTML = judul(nama, ket) + `
+async function layarCashflow(){
+  const tabel = "cashflow";
+  $("#layar").innerHTML = judul("Cashflow",
+    "Semua uang masuk dan keluar toko. Debit menambah saldo, kredit mengurangi.") + `
   <div class="papan">
     <div class="kepala-papan">
-      <h3>Buku ${nama}</h3>
+      <h3>Buku Cashflow</h3>
       <button class="tombol kuning" id="btnBuka">Tambah baris</button>
     </div>
     <div class="form-tambah" id="formTambah">
@@ -885,8 +1101,8 @@ async function layarBuku(tabel){
         <div style="grid-column:span 2"><label>Keterangan</label><input id="iKet" class="isian" placeholder="Setoran penjualan harian"></div>
         <div><label>Debit (masuk)</label><input id="iDebit" class="isian num uang" type="text" value="0"></div>
         <div><label>Kredit (keluar)</label><input id="iKredit" class="isian num uang" type="text" value="0"></div>
-        <div><label>Bukti transaksi</label><input id="iBukti" class="isian" type="file" accept="image/*,application/pdf" style="padding:9px"></div>
       </div>
+      <div style="margin-bottom:16px"><label>Bukti transaksi</label>${kotakBukti("cf")}</div>
       <div style="display:flex;gap:10px">
         <button class="tombol biru" id="btnSimpan">Simpan baris</button>
         <button class="tombol garis" id="btnBatal">Batal</button>
@@ -895,6 +1111,7 @@ async function layarBuku(tabel){
     <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
   </div>`;
   siapkanUang();
+  pasangBukti("cf");
 
   const form=$("#formTambah");
   $("#btnBuka").addEventListener("click", async () => {
@@ -909,28 +1126,139 @@ async function layarBuku(tabel){
 
   $("#btnSimpan").addEventListener("click", async () => {
     const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
-    let bukti=null;
-    const berkas=$("#iBukti").files[0];
-    if(berkas){
-      const path=`${tabel}/${Date.now()}-${berkas.name.replace(/[^\w.\-]/g,"_")}`;
-      const { error:eUp } = await sb.storage.from("bukti").upload(path, berkas);
-      if(eUp){ b.disabled=false; b.textContent="Simpan baris"; return toast("Bukti gagal diunggah: "+eUp.message,"gagal"); }
-      bukti = sb.storage.from("bukti").getPublicUrl(path).data.publicUrl;
-    }
+    const hasil = await unggahBukti("cf", tabel);
+    if(hasil.error){ b.disabled=false; b.textContent="Simpan baris"; return toast("Bukti gagal diunggah: "+hasil.error,"gagal"); }
+
     const { error } = await sb.from(tabel).insert({
       nomor:+$("#iNomor").value||1, tanggal:$("#iTgl").value||hariIni(),
       keterangan:$("#iKet").value.trim(), debit:uang("#iDebit"),
-      kredit:uang("#iKredit"), bukti_url:bukti
+      kredit:uang("#iKredit"), bukti_url:hasil.url
     });
     b.disabled=false; b.textContent="Simpan baris";
     if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
     toast("Baris tersimpan");
     form.classList.remove("buka");
-    $("#iKet").value=""; $("#iDebit").value="0"; $("#iKredit").value="0"; $("#iBukti").value="";
+    $("#iKet").value=""; $("#iDebit").value="0"; $("#iKredit").value="0"; resetBukti("cf");
     muatBuku(tabel);
   });
 
   muatBuku(tabel);
+}
+
+/* =====================================================================
+   10b. MANAJEMEN — KULAKAN (belanja ke supplier)
+   ===================================================================== */
+async function layarKulakan(){
+  const { data:buah } = await sb.from("stock_buah").select("jenis_buah,satuan").order("jenis_buah");
+  const pilihanBuah = (buah||[]).map(b =>
+    `<option value="${aman(b.jenis_buah)}" data-satuan="${aman(b.satuan)}">${aman(b.jenis_buah)}</option>`).join("");
+
+  $("#layar").innerHTML = judul("Kulakan",
+    "Catatan belanja buah ke supplier: apa yang dibeli, berapa banyak, dan berapa harganya.") + `
+  <div class="papan">
+    <div class="kepala-papan">
+      <h3>Buku Kulakan</h3>
+      <button class="tombol kuning" id="btnBuka">Tambah baris</button>
+    </div>
+    <div class="form-tambah" id="formTambah">
+      <div class="kisi">
+        <div><label>Nomor</label><input id="kNomor" class="isian num" type="number" min="1"></div>
+        <div><label>Tanggal</label><input id="kTgl" class="isian" type="date" value="${hariIni()}"></div>
+        <div style="grid-column:span 2"><label>Keterangan</label>
+          <input id="kKet" class="isian" list="daftarBuah" placeholder="Apel Fuji dari Pak Dedi">
+          <datalist id="daftarBuah">${pilihanBuah}</datalist></div>
+        <div><label>Jumlah</label><input id="kJumlah" class="isian num" type="number" min="0" step="0.5" value="0"></div>
+        <div><label>Satuan</label><select id="kSatuan" class="isian">
+          <option>Kg</option><option>Pcs</option><option>Peti</option><option>Ikat</option><option>Dus</option></select></div>
+        <div><label>Harga per satuan</label><input id="kHarga" class="isian num uang" type="text" value="0"></div>
+      </div>
+      <div style="margin-bottom:16px"><label>Bukti transaksi</label>${kotakBukti("kl")}</div>
+      <div class="total-bar" style="margin:0 0 16px">
+        <span class="lb">Total belanja</span><span class="ag num" id="kTotal">Rp 0</span>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="tombol biru" id="btnSimpan">Simpan baris</button>
+        <button class="tombol garis" id="btnBatal">Batal</button>
+      </div>
+    </div>
+    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
+  </div>`;
+  siapkanUang();
+  pasangBukti("kl");
+
+  const hitung = () => $("#kTotal").textContent = rp((+$("#kJumlah").value||0) * uang("#kHarga"));
+  $("#kJumlah").addEventListener("input", hitung);
+  $("#kHarga").addEventListener("input", hitung);
+  $("#kKet").addEventListener("input", () => {
+    const cocok = (buah||[]).find(b => b.jenis_buah === $("#kKet").value);
+    if(cocok) $("#kSatuan").value = cocok.satuan;
+  });
+
+  const form=$("#formTambah");
+  $("#btnBuka").addEventListener("click", async () => {
+    form.classList.toggle("buka");
+    if(form.classList.contains("buka")){
+      const { data } = await sb.from("kulakan").select("nomor").order("nomor",{ascending:false}).limit(1);
+      $("#kNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
+      $("#kKet").focus();
+    }
+  });
+  $("#btnBatal").addEventListener("click", () => form.classList.remove("buka"));
+
+  $("#btnSimpan").addEventListener("click", async () => {
+    if(!$("#kKet").value.trim()) return toast("Keterangan belum diisi.","gagal");
+    if(!(+$("#kJumlah").value > 0)) return toast("Jumlah harus lebih dari nol.","gagal");
+    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
+
+    const hasil = await unggahBukti("kl","kulakan");
+    if(hasil.error){ b.disabled=false; b.textContent="Simpan baris"; return toast("Bukti gagal diunggah: "+hasil.error,"gagal"); }
+
+    const { error } = await sb.from("kulakan").insert({
+      nomor:+$("#kNomor").value||1, tanggal:$("#kTgl").value||hariIni(),
+      keterangan:$("#kKet").value.trim(), jumlah:+$("#kJumlah").value||0,
+      satuan:$("#kSatuan").value, harga:uang("#kHarga"), bukti_url:hasil.url
+    });
+    b.disabled=false; b.textContent="Simpan baris";
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+    toast("Baris tersimpan");
+    form.classList.remove("buka");
+    $("#kKet").value=""; $("#kJumlah").value=0; $("#kHarga").value="0"; resetBukti("kl"); hitung();
+    muatKulakan();
+  });
+
+  muatKulakan();
+}
+
+async function muatKulakan(){
+  const { data, error } = await sb.from("kulakan").select("*").order("nomor",{ascending:true});
+  const w=$("#isiTabel"); if(!w) return;
+  if(error){ w.innerHTML=kosong("Tidak bisa memuat data",aman(error.message)); return; }
+  if(!data||!data.length){ w.innerHTML=kosong("Buku masih kosong","Tekan Tambah baris untuk mencatat belanja pertama."); return; }
+
+  let total=0;
+  const baris=data.map(r=>{
+    const sub = Number(r.jumlah||0)*Number(r.harga||0);
+    total += sub;
+    return `<tr>
+      <td class="num">${r.nomor}</td>
+      <td>${tglIndo(r.tanggal)}</td>
+      <td>${aman(r.keterangan)||"—"}</td>
+      <td class="kanan">${angka(r.jumlah)}</td>
+      <td>${aman(r.satuan)}</td>
+      <td class="kanan">${rp(r.harga)}</td>
+      <td class="kanan saldo-sel">${rp(sub)}</td>
+      <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat bukti</a>`:"—"}</td>
+      <td><button class="hapus" data-id="${r.id}">Hapus</button></td>
+    </tr>`;
+  }).join("");
+
+  w.innerHTML = `<table><thead><tr>
+      <th>Nomor</th><th>Tanggal</th><th>Keterangan</th><th class="kanan">Jumlah</th><th>Satuan</th>
+      <th class="kanan">Harga</th><th class="kanan">Total</th><th>Bukti Transaksi</th><th></th>
+    </tr></thead><tbody>${baris}</tbody>
+    <tfoot><tr><th colspan="6" class="kanan">Total belanja kulakan</th>
+      <th class="kanan num">${rp(total)}</th><th colspan="2"></th></tr></tfoot></table>`;
+  pasangHapus("kulakan", muatKulakan);
 }
 
 async function muatBuku(tabel){
@@ -1111,7 +1439,8 @@ async function muatOpname(){
    13. MANAJEMEN — STOCK BUAH
    ===================================================================== */
 async function layarStokBuah(){
-  $("#layar").innerHTML = judul("Stock Buah", "Sisa barang per jenis buah. Ubah jumlahnya langsung di kolom.") + `
+  $("#layar").innerHTML = judul("Stock Buah",
+    "Daftar ini sekaligus menjadi pilihan buah di layar kasir. Apa yang dihapus di sini hilang juga dari kasir.") + `
   <div class="papan">
     <div class="kepala-papan"><h3>Persediaan</h3>
       <button class="tombol kuning" id="btnBuka">Tambah jenis</button></div>
@@ -1121,6 +1450,7 @@ async function layarStokBuah(){
         <div><label>Jumlah</label><input id="bJumlah" class="isian num" type="number" min="0" step="0.5" value="0"></div>
         <div><label>Satuan</label>
           <select id="bSatuan" class="isian"><option>Kg</option><option>Pcs</option><option>Peti</option><option>Ikat</option></select></div>
+        <div><label>Harga jual per satuan</label><input id="bHarga" class="isian num uang" type="text" value="0"></div>
       </div>
       <div style="display:flex;gap:10px">
         <button class="tombol biru" id="btnSimpan">Simpan jenis</button>
@@ -1130,6 +1460,7 @@ async function layarStokBuah(){
     <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
   </div>`;
 
+  siapkanUang();
   const form=$("#formTambah");
   $("#btnBuka").addEventListener("click",()=>{ form.classList.toggle("buka"); if(form.classList.contains("buka")) $("#bNama").focus(); });
   $("#btnBatal").addEventListener("click",()=>form.classList.remove("buka"));
@@ -1137,10 +1468,12 @@ async function layarStokBuah(){
     if(!$("#bNama").value.trim()) return toast("Nama buah belum diisi.","gagal");
     const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
     const { error } = await sb.from("stock_buah").insert({
-      jenis_buah:$("#bNama").value.trim(), jumlah:+$("#bJumlah").value||0, satuan:$("#bSatuan").value });
+      jenis_buah:$("#bNama").value.trim(), jumlah:+$("#bJumlah").value||0,
+      satuan:$("#bSatuan").value, harga:uang("#bHarga"), aktif:true });
     b.disabled=false; b.textContent="Simpan jenis";
     if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
-    toast("Jenis buah ditambahkan"); form.classList.remove("buka"); $("#bNama").value=""; $("#bJumlah").value=0; muatStokBuah();
+    toast("Jenis buah ditambahkan"); form.classList.remove("buka");
+    $("#bNama").value=""; $("#bJumlah").value=0; $("#bHarga").value="0"; muatStokBuah();
   });
   muatStokBuah();
 }
@@ -1148,22 +1481,38 @@ async function layarStokBuah(){
 async function muatStokBuah(){
   const { data } = await sb.from("stock_buah").select("*").order("jenis_buah");
   const w=$("#isiTabel"); if(!w) return;
-  if(!data||!data.length){ w.innerHTML=kosong("Belum ada persediaan","Tambahkan jenis buah yang kamu jual."); return; }
+  if(!data||!data.length){
+    w.innerHTML=kosong("Belum ada persediaan","Tambahkan jenis buah yang kamu jual — daftar kasir ikut mengikuti.");
+    return;
+  }
   w.innerHTML = `<table><thead><tr>
-      <th>Jenis Buah</th><th class="kanan">Jumlah</th><th>Satuan</th><th></th><th></th></tr></thead><tbody>` +
+      <th>Jenis Buah</th><th class="kanan">Jumlah</th><th>Satuan</th>
+      <th class="kanan">Harga jual</th><th>Tampil di kasir</th><th></th><th></th></tr></thead><tbody>` +
     data.map(r=>`<tr>
       <td>${aman(r.jenis_buah)}</td>
       <td class="kanan"><input class="isian num ubah-jumlah" data-id="${r.id}" type="number" step="0.5" min="0"
-           value="${r.jumlah}" style="width:110px;padding:7px 10px;text-align:right"></td>
+           value="${r.jumlah}" style="width:100px;padding:7px 10px;text-align:right"></td>
       <td>${aman(r.satuan)}</td>
-      <td><button class="tombol garis simpan-jumlah" data-id="${r.id}" style="padding:6px 13px;font-size:13px">Simpan</button></td>
+      <td class="kanan"><input class="isian num uang ubah-harga" data-id="${r.id}" type="text"
+           value="${r.harga||0}" style="width:120px;padding:7px 10px;text-align:right"></td>
+      <td><label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:600">
+        <input type="checkbox" class="ubah-aktif" data-id="${r.id}" ${r.aktif?"checked":""}
+          style="width:17px;height:17px;accent-color:var(--biru)"> ${r.aktif?"Ya":"Tidak"}</label></td>
+      <td><button class="tombol garis simpan-baris" data-id="${r.id}" style="padding:6px 13px;font-size:13px">Simpan</button></td>
       <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+  siapkanUang();
 
-  document.querySelectorAll(".simpan-jumlah").forEach(b => b.addEventListener("click", async () => {
-    const inp=document.querySelector(`.ubah-jumlah[data-id="${b.dataset.id}"]`);
-    const { error } = await sb.from("stock_buah")
-      .update({ jumlah:+inp.value||0, updated_at:new Date().toISOString() }).eq("id",b.dataset.id);
-    toast(error ? "Gagal menyimpan: "+error.message : "Jumlah diperbarui", error?"gagal":"sukses");
+  document.querySelectorAll(".simpan-baris").forEach(b => b.addEventListener("click", async () => {
+    const id = b.dataset.id;
+    const jml = document.querySelector(`.ubah-jumlah[data-id="${id}"]`);
+    const hrg = document.querySelector(`.ubah-harga[data-id="${id}"]`);
+    const akt = document.querySelector(`.ubah-aktif[data-id="${id}"]`);
+    const { error } = await sb.from("stock_buah").update({
+      jumlah:+jml.value||0, harga:uang(hrg), aktif:akt.checked,
+      updated_at:new Date().toISOString()
+    }).eq("id", id);
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+    toast("Baris diperbarui"); muatStokBuah();
   }));
   pasangHapus("stock_buah", muatStokBuah);
 }
@@ -1386,7 +1735,7 @@ function gambarLonceng(){
   const boleh = profil && profil.role === "manajemen";
   const n = jumlahBelumDibaca();
   document.querySelectorAll(".lonceng").forEach(b => {
-    b.style.display = boleh ? "block" : "none";
+    b.style.display = boleh ? "flex" : "none";
     const t = b.querySelector(".titik");
     if(t){ t.textContent = n > 9 ? "9+" : String(n); t.className = "titik" + (n ? " ada" : ""); }
   });
@@ -1515,7 +1864,10 @@ function bukaPanelNotifikasi(){
   });
 }
 
-document.querySelectorAll(".lonceng").forEach(b => b.addEventListener("click", bukaPanelNotifikasi));
+document.querySelectorAll(".lonceng").forEach(b => {
+  b.insertAdjacentHTML("afterbegin", ikon("lonceng",20));
+  b.addEventListener("click", bukaPanelNotifikasi);
+});
 
 /* =====================================================================
    16. AKUN SAYA
@@ -1646,7 +1998,6 @@ async function jalankanPasang(){
   document.querySelectorAll(".pasang").forEach(b => b.classList.remove("tampil"));
 }
 $("#btnPasang").addEventListener("click", jalankanPasang);
-$("#btnPasangHp").addEventListener("click", jalankanPasang);
 window.addEventListener("appinstalled", () => {
   promptPasang = null;
   tutupDialogPasang(true);
