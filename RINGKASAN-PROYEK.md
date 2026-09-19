@@ -1,0 +1,241 @@
+# buahmurah.id — Ringkasan Proyek (v3)
+
+> Berkas ini dibuat untuk dilampirkan ke percakapan Claude yang baru supaya pengerjaan
+> bisa dilanjutkan tanpa mengulang penjelasan dari nol. Lampirkan file ini bersama
+> `index.html` dan `supabase-setup.sql` dari dalam ZIP.
+
+---
+
+## 1. Apa yang sedang dibangun
+
+Aplikasi kasir dan pembukuan untuk **toko buah bernama buahmurah.id**, dipakai dua jenis akun:
+
+- **Akun kasir** — mencatat penjualan dan pengeluaran harian dari HP di kios.
+- **Akun manajemen** — pembukuan lengkap, gudang, pengelolaan pengguna, dan menerima
+  notifikasi setiap kali kasir menyimpan catatan.
+
+Teknologi: **HTML satu berkas + Supabase** (Auth, Postgres, Realtime, Storage, Edge Function),
+dipasang sebagai **PWA**. Tidak ada proses build, tidak ada framework, tidak ada npm. Semua CSS
+dan JavaScript ada di dalam `index.html`; library Supabase diambil dari CDN jsdelivr.
+
+Warna wajib: **biru dan kuning**. Bahasa antarmuka: **Indonesia**, termasuk nama variabel dan
+fungsi di dalam kode (`muatBuku`, `bukaModal`, `uang()`, `aman()`, `gambarLonceng()`, dst).
+
+---
+
+## 2. Kredensial proyek
+
+**Supabase**
+
+```
+URL   : https://uuorhkhpubkvsilsybvw.supabase.co
+Key   : sb_publishable_Ers0TipmzhLN-yENqavlBg_tmOU-Vp6   (publishable / anon)
+```
+
+Sudah tertulis di bagian KONFIGURASI pada baris awal `<script>` di `index.html`.
+
+**Dua akun login**, dibuat langsung oleh `supabase-setup.sql` bagian 3:
+
+| Email | Role | Jabatan | Kata sandi awal |
+|---|---|---|---|
+| `panglima@gmail.com` | manajemen | Pemilik | `Panglima2026` |
+| `buahmurah.id@gmail.com` | kasir | Kasir | `Kasir2026` |
+
+Ganti kata sandi lewat menu **Akun saya** setelah login pertama.
+
+---
+
+## 3. Spesifikasi asli dari pemilik
+
+**Akun Kasir**
+
+| Modul | Fitur | Keterangan | Satuan |
+|---|---|---|---|
+| Penjualan | Jenis buah | pilihan | |
+| | Qty | pilihan angka | Kg |
+| | Harga | isian | |
+| | Pembayaran | Cash / Transfer | **wajib dipilih**; bukti transfer opsional |
+| | Submit / OK | | |
+| Pengeluaran | Keterangan | isian | |
+| | Nominal | isian | |
+| | Submit / OK | | |
+
+**Akun Manajemen**
+
+| Modul | Kolom |
+|---|---|
+| Cashflow | Nomor, Tanggal, Keterangan, Debit, Kredit, Saldo, Bukti Transaksi |
+| Kulakan | Nomor, Tanggal, Keterangan, Debit, Kredit, Saldo, Bukti Transaksi |
+| Gaji | Nomor, Bulan, Absensi/Total Hari, Kasbon, Total |
+| Stock Opname | Nomor, Tanggal, Keterangan, Kondisi Baik/Rusak |
+| Stock Buah | Jenis Buah, Jumlah, Satuan |
+
+Kolom **Saldo** tidak disimpan di database, dihitung berjalan di layar
+(`saldo += debit - kredit`, diurutkan berdasarkan Nomor).
+
+---
+
+## 4. Isi ZIP
+
+```
+index.html                      aplikasi utama, satu berkas
+manifest.json                   manifest PWA
+sw.js                           service worker (cache + notifikasi)
+ikon/ikon-192.png               ikon aplikasi
+ikon/ikon-512.png
+ikon/ikon-maskable-512.png      versi maskable, ada padding aman
+ikon/apple-touch-icon.png       untuk iPhone
+supabase-setup.sql              seluruh skema database + pembuatan dua akun
+edge-function-kelola-user.ts    Edge Function untuk kelola akun
+RINGKASAN-PROYEK.md             berkas ini
+```
+
+Struktur folder di hosting harus **persis seperti di atas** — `index.html` memanggil
+`manifest.json`, `sw.js`, dan folder `ikon/` dengan jalur relatif.
+
+---
+
+## 5. Langkah pemasangan
+
+1. Supabase → SQL Editor → tempel seluruh `supabase-setup.sql` → Run.
+   Ini membuat semua tabel, policy, trigger notifikasi, dan dua akun login.
+2. Edge Functions → Deploy a new function → nama **persis** `kelola-user` → tempel isi
+   `edge-function-kelola-user.ts` → Deploy. Tanpa ini, tombol tambah akun dan ganti kata
+   sandi orang lain tidak jalan (aplikasi menawarkan kirim link reset sebagai gantinya).
+3. Authentication → Providers → Email → **matikan Confirm email**, supaya akun baru yang
+   dibuat dari menu Pengguna langsung bisa masuk.
+4. Upload semua berkas ke hosting **HTTPS** (Netlify Drop, Vercel, Cloudflare Pages).
+   PWA dan notifikasi tidak jalan lewat `file://` atau HTTP biasa.
+
+---
+
+## 6. Struktur database
+
+| Tabel | Isi | Siapa yang boleh |
+|---|---|---|
+| `profiles` | id, email, nama, jabatan, role, hak_akses (text[]), aktif | baca diri sendiri; manajemen baca & ubah semua |
+| `jenis_buah` | nama, satuan, harga, aktif | semua baca; manajemen ubah |
+| `stock_buah` | jenis_buah, jumlah, satuan | semua baca; manajemen ubah |
+| `penjualan` | tanggal, jenis_buah, qty, satuan, harga, total (generated), pembayaran, bukti_url, user_id | kasir hanya miliknya; manajemen semua |
+| `pengeluaran` | tanggal, keterangan, nominal, user_id | sama seperti penjualan |
+| `cashflow` | nomor, tanggal, keterangan, debit, kredit, bukti_url | khusus manajemen |
+| `kulakan` | sama seperti cashflow | khusus manajemen |
+| `gaji` | nomor, nama, bulan, absensi, total_hari, kasbon, total | khusus manajemen |
+| `stock_opname` | nomor, tanggal, keterangan, kondisi | khusus manajemen |
+| `notifikasi` | judul, pesan, jenis, nominal, untuk_role, ref_tabel, ref_id, dari_nama, dibaca | dibaca oleh role tujuan saja |
+
+Fungsi bantu: `public.my_role()` dan `public.is_manajemen()`, keduanya `security definer`
+supaya policy tidak rekursif.
+
+Trigger: `on_auth_user_created` membuat baris `profiles` dari `raw_user_meta_data`;
+`on_auth_user_email_change` menyamakan email; `on_penjualan_notif` dan `on_pengeluaran_notif`
+menulis baris ke `notifikasi` setiap kali kasir menyimpan.
+
+Storage bucket **`bukti`** (publik) untuk bukti transaksi, dengan awalan folder
+`penjualan/`, `cashflow/`, `kulakan/`.
+
+---
+
+## 7. Cara kerja notifikasi
+
+Rantainya: kasir menyimpan → trigger Postgres menulis baris di `notifikasi` →
+Supabase Realtime mengirim event INSERT → `index.html` menangkapnya lewat
+`sb.channel("notifikasi-masuk")` → memanggil `registration.showNotification()`.
+
+Yang tampil di layar manajemen: lonceng dengan angka belum dibaca di sidebar dan di
+bilah atas HP, panel daftar 50 notifikasi terakhir, tombol tandai semua sudah dibaca,
+dan toast di dalam aplikasi. Mengetuk notifikasi HP membuka menu Data Penjualan atau
+Data Pengeluaran lewat `postMessage` dari service worker.
+
+Izin notifikasi diminta lewat tombol (bukan otomatis saat muat), sesuai syarat browser.
+Tawaran muncul sekali saja untuk akun manajemen, dan bisa diaktifkan kapan saja dari
+menu **Akun saya** atau dari panel lonceng.
+
+**Batasannya:** notifikasi muncul selama aplikasi masih berjalan, termasuk saat berada di
+latar belakang. Kalau aplikasi benar-benar ditutup, notifikasi tidak masuk. Untuk itu
+dibutuhkan Web Push sungguhan — kunci VAPID plus pengirim di Edge Function. Handler `push`
+di `sw.js` sudah disiapkan untuk itu, tinggal menambah tabel langganan push dan pengirimnya.
+
+---
+
+## 8. Yang sudah selesai
+
+**Autentikasi.** Login email + password, sesi bertahan, lupa kata sandi lewat link reset.
+Adapter penyimpanan sesi dibungkus try/catch supaya tidak pecah tanpa `localStorage`.
+
+**Menu berdasar hak akses.** `SEMUA_MENU` memuat seluruh menu beserta ikon dan grup;
+`BAWAAN` memuat menu bawaan per role. Kalau `profiles.hak_akses` kosong, dipakai bawaan
+role. Menu bertanda `khususManajemen` selalu disembunyikan dari akun kasir.
+
+**Penjualan.** Pilih buah → harga terisi otomatis, stepper +/− 0,5 Kg, total besar di bar
+kuning. Cash atau Transfer wajib dipilih; kalau belum, tombol simpan menolak dan kotak
+pilihan diberi garis merah. Memilih Transfer memunculkan unggah bukti (opsional,
+`capture="environment"` agar kamera HP langsung terbuka).
+
+**Pengeluaran, Riwayat, Cashflow, Kulakan, Gaji, Stock Opname, Stock Buah, Data kasir**
+— semua sesuai tabel spesifikasi, dengan nomor otomatis, saldo berjalan, dan unggah bukti.
+
+**Pengguna** (khusus manajemen). Tambah akun, ubah nama/jabatan/email/role/hak akses,
+ganti kata sandi, hapus akun.
+
+**Format ribuan.** Semua isian nominal memakai `class="uang"`; `pasangUang()` memformat
+saat diketik sambil menjaga posisi kursor, `uang(selector)` mengembalikan angka murni.
+Panggil `siapkanUang()` setiap selesai merender layar.
+
+**PWA.** Saat aplikasi pertama dibuka muncul dialog **Instal / Nanti saja**. Pilihan
+"Nanti saja" disimpan dan baru ditanya lagi tiga hari kemudian. Di iPhone, dialog berubah
+jadi panduan manual karena Safari tidak menyediakan `beforeinstallprompt`. Service worker
+memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke domain
+`supabase.co` tidak pernah di-cache.
+
+---
+
+## 9. Konvensi kode
+
+- Semua nama fungsi dan variabel berbahasa Indonesia.
+- Pola layar: `layarX()` merender HTML ke `#layar`, lalu `muatX()` mengisi tabelnya.
+  Setelah render selalu panggil `siapkanUang()`.
+- Fungsi bantu: `$()`, `rp()`, `angka()`, `tglIndo()`, `hariIni()`, `bulanIni()`,
+  `aman()` untuk escape HTML, `toast()`, `pasangHapus(tabel, muatUlang)`, dan
+  `bukaModal(judul, isiHTML, saatSimpan, labelTombol)` — kalau `saatSimpan` diisi `null`,
+  tombol Simpan disembunyikan dan Batal berubah jadi Tutup.
+- Semua input pengguna yang masuk ke HTML wajib lewat `aman()`.
+- Token warna di `:root`: `--biru-tua #0A3D91`, `--biru #1157C7`, `--kuning #FFC91D`,
+  `--biru-kabut #E7F0FF`, `--bg #F4F7FC`, `--tinta #0E1B33`. Kuning hanya untuk aksi dan
+  angka penting, bukan hiasan.
+- Font Plus Jakarta Sans, angka memakai `font-variant-numeric: tabular-nums`.
+- Sidebar di layar lebar, tab bawah di layar ≤960px, padding `env(safe-area-inset-*)`.
+- **Naikkan angka `VERSI` di `sw.js` setiap kali `index.html` diubah**, kalau tidak HP
+  akan tetap membuka versi lama dari cache. Sekarang bernilai `buahmurah-v2`.
+
+---
+
+## 10. Yang belum dikerjakan
+
+1. **Web Push sungguhan** supaya notifikasi tetap masuk saat aplikasi tertutup — perlu
+   kunci VAPID, tabel langganan push, dan pengirim di Edge Function.
+2. **Stok tidak berkurang otomatis.** Penjualan belum memotong `stock_buah`. Sengaja
+   dipisah karena kulakan sering masuk per peti, bukan per Kg.
+3. **Laporan dan ekspor.** Belum ada rekap per periode, grafik, atau unduh Excel/PDF.
+4. **Master jenis buah belum ada layarnya.** Harganya masih harus diubah dari dashboard
+   Supabase.
+5. **Edit baris pembukuan.** Cashflow, kulakan, gaji, dan opname hanya bisa ditambah dan
+   dihapus, belum bisa diedit.
+6. **Kolom `profiles.aktif`** sudah ada tapi belum dipakai untuk menonaktifkan akun.
+7. **Antrean offline.** Aplikasi tetap terbuka tanpa sinyal, tapi menyimpan transaksi
+   masih butuh internet.
+8. **Pencarian dan filter tanggal** pada tabel data belum ada; masih dibatasi 100–300
+   baris terakhir.
+
+---
+
+## 11. Cara memakai ringkasan ini di chat baru
+
+Kalimat pembuka yang disarankan:
+
+> Aku sedang membangun buahmurah.id, aplikasi kasir dan pembukuan toko buah dengan
+> HTML satu berkas + Supabase, dipasang sebagai PWA. Ini ringkasan proyeknya dan berkas
+> kodenya. Tolong lanjutkan dengan [sebutkan yang mau dikerjakan]. Ikuti konvensi di
+> bagian 9, pertahankan bahasa Indonesia dan warna biru-kuning.
+
+Lampirkan `RINGKASAN-PROYEK.md`, `index.html`, dan `supabase-setup.sql`.

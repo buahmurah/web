@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>buahmurah.id</title>
+
+<!-- ===== PWA ===== -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A3D91">
+<meta name="description" content="Kasir dan pembukuan toko buah dalam satu aplikasi.">
+<link rel="icon" href="ikon/ikon-192.png">
+<link rel="apple-touch-icon" href="ikon/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="buahmurah">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --biru-tua:#0A3D91; --biru:#1157C7;
+  --biru-kabut:#E7F0FF; --kuning:#FFC91D; --kuning-tua:#E5A800;
+  --tinta:#0E1B33; --teks-lembut:#5F708C;
+  --garis:#DCE5F2; --bg:#F4F7FC; --putih:#fff;
+  --merah:#C62F3B; --hijau:#137A4E;
+  --r:14px; --r-kecil:9px;
+  --aman-bawah:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+  background:var(--bg); color:var(--tinta); line-height:1.5; font-size:15px;
+  -webkit-font-smoothing:antialiased; overscroll-behavior-y:contain;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--biru)}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--kuning);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.merek{font-weight:800;letter-spacing:-.03em;line-height:1}
+.merek .id{color:var(--kuning)}
+
+/* ============ LOGIN ============ */
+#login{min-height:100dvh;display:grid;grid-template-columns:1.05fr .95fr}
+.login-kiri{
+  background:var(--biru-tua);
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(255,201,29,.22) 0 22%, transparent 22.5%),
+    radial-gradient(circle at 72% 68%, rgba(46,123,239,.55) 0 26%, transparent 26.5%),
+    radial-gradient(circle at 40% 88%, rgba(255,201,29,.12) 0 18%, transparent 18.5%);
+  color:#fff;padding:56px 52px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.login-kiri .merek{font-size:clamp(38px,4.6vw,60px)}
+.login-kiri p{max-width:34ch;color:#C6D8F5;margin-top:18px;font-size:17px}
+.keranjang{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:40px}
+.keranjang span{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  padding:7px 14px;border-radius:100px;font-size:13px;font-weight:600;color:#DCE8FB}
+.login-kanan{display:flex;align-items:center;justify-content:center;padding:40px 32px;background:var(--putih)}
+.kotak-login{width:100%;max-width:370px}
+.kotak-login h1{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.kotak-login .sub{color:var(--teks-lembut);margin:6px 0 30px}
+label{display:block;font-size:13.5px;font-weight:600;margin-bottom:7px}
+.isian{
+  width:100%;padding:13px 15px;border:1.5px solid var(--garis);border-radius:var(--r-kecil);
+  background:var(--putih);transition:border-color .15s}
+.isian:focus{border-color:var(--biru);outline:none;box-shadow:0 0 0 3px var(--biru-kabut)}
+.grup{margin-bottom:18px}
+.tombol-utama{
+  width:100%;background:var(--biru);color:#fff;font-weight:700;padding:14px;
+  border-radius:var(--r-kecil);transition:background .15s}
+.tombol-utama:hover{background:var(--biru-tua)}
+.tombol-utama:disabled{opacity:.55;cursor:not-allowed}
+.pesan{padding:12px 14px;border-radius:var(--r-kecil);font-size:14px;margin-bottom:18px;display:none}
+.pesan.tampil{display:block}
+.pesan.salah{background:#FDECEE;color:var(--merah);border:1px solid #F5C6CB}
+.pesan.info{background:var(--biru-kabut);color:var(--biru-tua);border:1px solid #C5DAFB}
+.lupa{margin-top:14px;text-align:center;font-size:13.5px}
+.lupa button{color:var(--biru);font-weight:600}
+@media(max-width:860px){
+  #login{grid-template-columns:1fr}
+  .login-kiri{padding:calc(34px + env(safe-area-inset-top)) 26px 32px}
+  .login-kiri p{font-size:15px}
+  .keranjang{padding-top:26px}
+  .login-kanan{padding:32px 24px 60px}
+}
+
+/* ============ RANGKA ============ */
+#app{display:none;min-height:100dvh;grid-template-columns:238px 1fr}
+#app.tampil{display:grid}
+.sisi{background:var(--biru-tua);color:#fff;padding:22px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100dvh}
+.sisi-atas{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px 20px}
+.sisi .merek{font-size:22px}
+.menu{display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.menu button{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  padding:11px 12px;border-radius:10px;color:#B9CFF0;font-weight:600;font-size:14.5px;transition:.15s}
+.menu button:hover{background:rgba(255,255,255,.08);color:#fff}
+.menu button.aktif{background:var(--kuning);color:var(--biru-tua);font-weight:700}
+.menu .ikon{width:19px;text-align:center;font-size:15px}
+.menu .pisah{color:#7E9AC6;font-size:11.5px;font-weight:700;padding:16px 12px 7px;letter-spacing:.04em}
+.kartu-user{margin-top:auto;padding:13px 12px;background:rgba(255,255,255,.07);border-radius:11px}
+.kartu-user .nm{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kartu-user .rl{font-size:12px;color:var(--kuning);font-weight:600;margin-top:1px}
+.kartu-user button{margin-top:10px;width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-size:13px;font-weight:600}
+.kartu-user button:hover{background:rgba(255,255,255,.22)}
+.pasang{background:var(--kuning)!important;color:var(--biru-tua)!important;display:none}
+.pasang.tampil{display:block}
+
+main{padding:30px 34px 90px;min-width:0}
+.judul{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.judul h2{font-size:25px;font-weight:800;letter-spacing:-.02em}
+.judul p{color:var(--teks-lembut);font-size:14.5px;margin-top:3px}
+
+.papan{background:var(--putih);border:1px solid var(--garis);border-radius:var(--r)}
+.papan-isi{padding:22px}
+.tombol{padding:11px 18px;border-radius:var(--r-kecil);font-weight:700;font-size:14.5px;transition:.15s}
+.tombol.kuning{background:var(--kuning);color:var(--biru-tua)}
+.tombol.kuning:hover{background:var(--kuning-tua)}
+.tombol.biru{background:var(--biru);color:#fff}
+.tombol.biru:hover{background:var(--biru-tua)}
+.tombol.garis{border:1.5px solid var(--garis);background:#fff}
+.tombol.garis:hover{border-color:var(--biru);color:var(--biru)}
+.tombol:disabled{opacity:.5;cursor:not-allowed}
+
+/* ============ KASIR ============ */
+.kasir{display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start}
+.baris2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pilih-bayar{display:flex;gap:10px}
+.pilih-bayar button{
+  flex:1;padding:13px;border:1.5px solid var(--garis);border-radius:var(--r-kecil);
+  font-weight:600;background:#fff;transition:.15s}
+.pilih-bayar button.aktif{border-color:var(--biru);background:var(--biru-kabut);color:var(--biru-tua)}
+.pilih-bayar.perlu button{border-color:#F0B8BD}
+.stepper{display:flex;align-items:center}
+.stepper button{width:48px;height:48px;border:1.5px solid var(--garis);background:#fff;font-size:20px;font-weight:700;color:var(--biru)}
+.stepper button:first-child{border-radius:var(--r-kecil) 0 0 var(--r-kecil)}
+.stepper input{flex:1;height:48px;text-align:center;border:1.5px solid var(--garis);border-left:none;border-right:none;font-weight:700;font-size:17px;min-width:0}
+.satuan-tag{
+  display:inline-flex;align-items:center;padding:0 12px;height:48px;background:var(--biru-kabut);
+  color:var(--biru-tua);font-weight:700;border-radius:0 var(--r-kecil) var(--r-kecil) 0;border:1.5px solid var(--garis);border-left:none}
+.satuan-awal{border-radius:var(--r-kecil) 0 0 var(--r-kecil);border:1.5px solid var(--garis);border-right:none}
+.dengan-satuan{display:flex}
+.dengan-satuan .isian{height:48px;border-radius:0}
+.dengan-satuan .isian:first-child{border-radius:var(--r-kecil) 0 0 var(--r-kecil)}
+.dengan-satuan .isian:last-child{border-radius:0 var(--r-kecil) var(--r-kecil) 0}
+.total-bar{
+  background:var(--kuning);border-radius:var(--r);padding:20px 22px;margin:4px 0 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.total-bar .lb{font-weight:700;color:var(--biru-tua);font-size:15px}
+.total-bar .ag{font-size:31px;font-weight:800;color:var(--biru-tua);letter-spacing:-.02em}
+.ringkas{display:flex;flex-direction:column;gap:14px}
+.stat{background:var(--putih);border:1px solid var(--garis);border-radius:var(--r);padding:18px 20px}
+.stat .lb{font-size:13.5px;color:var(--teks-lembut);font-weight:600}
+.stat .ag{font-size:26px;font-weight:800;margin-top:5px;letter-spacing:-.02em}
+.stat.tegas{background:var(--biru-tua);border-color:var(--biru-tua)}
+.stat.tegas .lb{color:#A9C5EC}
+.stat.tegas .ag{color:var(--kuning)}
+.kotak-transfer{display:none;margin-top:14px;padding:14px;background:var(--biru-kabut);border-radius:var(--r-kecil)}
+.kotak-transfer.tampil{display:block}
+.kotak-transfer label{margin-bottom:6px}
+.kotak-transfer .ket{font-size:13px;color:var(--biru-tua);margin-top:7px}
+
+/* ============ TABEL ============ */
+.gulung{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:700;font-size:12.5px;color:var(--biru-tua);background:var(--biru-kabut);padding:11px 13px;white-space:nowrap;border-bottom:1px solid var(--garis)}
+td{padding:11px 13px;border-bottom:1px solid #EDF2F9;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+.kanan{text-align:right}
+td.kanan,th.kanan{font-variant-numeric:tabular-nums}
+.saldo-sel{font-weight:700;background:#FFFBEB}
+.kosong{padding:44px 20px;text-align:center;color:var(--teks-lembut)}
+.kosong strong{display:block;color:var(--tinta);font-size:16px;margin-bottom:4px}
+.lencana{display:inline-block;padding:3px 9px;border-radius:100px;font-size:12px;font-weight:700}
+.lencana.baik{background:#E3F5EC;color:var(--hijau)}
+.lencana.rusak{background:#FDECEE;color:var(--merah)}
+.lencana.cash{background:#FFF6D9;color:#8A6300}
+.lencana.tf{background:var(--biru-kabut);color:var(--biru-tua)}
+.lencana.mjm{background:#0A3D91;color:var(--kuning)}
+.lencana.ksr{background:var(--biru-kabut);color:var(--biru-tua)}
+.hapus{color:var(--merah);font-weight:600;font-size:13px}
+.aksi-mini{color:var(--biru);font-weight:600;font-size:13px;margin-right:12px}
+.form-tambah{background:#F8FBFF;border-bottom:1px solid var(--garis);padding:18px 22px;display:none}
+.form-tambah.buka{display:block}
+.kisi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:16px}
+.kepala-papan{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;border-bottom:1px solid var(--garis);flex-wrap:wrap}
+.kepala-papan h3{font-size:16px;font-weight:700}
+.kepala-papan .ket{font-size:13px;color:var(--teks-lembut)}
+
+/* ============ HAK AKSES ============ */
+.hak{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.hak label{
+  display:flex;align-items:center;gap:9px;margin:0;padding:10px 12px;border:1.5px solid var(--garis);
+  border-radius:var(--r-kecil);font-weight:600;font-size:14px;cursor:pointer;background:#fff}
+.hak label:has(input:checked){border-color:var(--biru);background:var(--biru-kabut);color:var(--biru-tua)}
+.hak input{width:17px;height:17px;accent-color:var(--biru)}
+.hak-grup{font-size:12px;font-weight:700;color:var(--teks-lembut);grid-column:1/-1;padding-top:6px}
+
+/* ============ MODAL ============ */
+#tirai{
+  position:fixed;inset:0;background:rgba(9,25,50,.55);display:none;z-index:60;
+  align-items:center;justify-content:center;padding:20px}
+#tirai.tampil{display:flex}
+.modal{background:#fff;border-radius:var(--r);width:100%;max-width:620px;max-height:88dvh;display:flex;flex-direction:column}
+.modal-kepala{padding:20px 24px;border-bottom:1px solid var(--garis);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.modal-kepala h3{font-size:18px;font-weight:800}
+.modal-kepala button{font-size:22px;color:var(--teks-lembut);line-height:1;padding:4px 8px}
+.modal-isi{padding:22px 24px;overflow-y:auto}
+.modal-kaki{padding:16px 24px;border-top:1px solid var(--garis);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ============ HP ============ */
+.nav-bawah{display:none}
+.puncak{display:none}
+@media(max-width:960px){
+  #app.tampil{grid-template-columns:1fr}
+  .sisi{display:none}
+  main{padding:0 16px calc(96px + var(--aman-bawah))}
+  .kasir{grid-template-columns:1fr}
+  .baris2{grid-template-columns:1fr}
+  .judul h2{font-size:22px}
+  .papan-isi{padding:18px}
+  .kepala-papan{padding:14px 18px}
+  .form-tambah{padding:16px 18px}
+  .puncak{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--biru-tua);color:#fff;margin:0 -16px 20px;
+    padding:calc(14px + env(safe-area-inset-top)) 16px 14px;position:sticky;top:0;z-index:30}
+  .puncak .merek{font-size:18px}
+  .puncak .kanan-atas{display:flex;gap:14px;align-items:center}
+  .puncak button{color:var(--kuning);font-weight:700;font-size:13px}
+  .nav-bawah{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--biru-tua);
+    padding:8px 6px calc(8px + var(--aman-bawah));gap:2px;overflow-x:auto}
+  .nav-bawah button{
+    flex:1 0 auto;min-width:70px;padding:8px 6px;border-radius:9px;color:#B9CFF0;
+    font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .nav-bawah button .ikon{font-size:17px}
+  .nav-bawah button.aktif{background:var(--kuning);color:var(--biru-tua)}
+  .modal{max-height:92dvh}
+  .modal-kaki{padding-bottom:calc(16px + var(--aman-bawah))}
+}
+
+/* ============ LONCENG NOTIFIKASI ============ */
+.lonceng{position:relative;display:none;font-size:19px;line-height:1;padding:6px;border-radius:9px;color:#fff}
+.lonceng:hover{background:rgba(255,255,255,.12)}
+.lonceng .titik{
+  position:absolute;top:-2px;right:-3px;min-width:18px;height:18px;padding:0 5px;
+  background:var(--kuning);color:var(--biru-tua);border-radius:100px;
+  font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;line-height:18px}
+.lonceng .titik.ada{display:block}
+.daftar-notif{display:flex;flex-direction:column;gap:2px}
+.notif{padding:13px 14px;border-radius:var(--r-kecil);border:1px solid var(--garis);margin-bottom:8px}
+.notif.baru{border-color:#BBD4FA;background:var(--biru-kabut)}
+.notif .nj{font-weight:700;font-size:14.5px}
+.notif .np{font-size:14px;margin-top:2px}
+.notif .nw{font-size:12.5px;color:var(--teks-lembut);margin-top:5px}
+
+/* ============ DIALOG PASANG APLIKASI ============ */
+#dialogPasang{
+  position:fixed;inset:0;background:rgba(9,25,50,.6);z-index:70;display:none;
+  align-items:center;justify-content:center;padding:22px}
+#dialogPasang.tampil{display:flex}
+.kotak-pasang{
+  background:#fff;border-radius:var(--r);padding:28px 26px calc(24px + var(--aman-bawah));
+  max-width:380px;width:100%;text-align:center}
+.kotak-pasang img{border-radius:16px;margin-bottom:16px}
+.kotak-pasang h3{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.kotak-pasang p{color:var(--teks-lembut);font-size:14.5px;margin:9px 0 22px}
+.kotak-pasang .tombol{width:100%;padding:14px}
+.kotak-pasang .tombol.garis{margin-top:10px}
+
+#toast{
+  position:fixed;left:50%;bottom:calc(28px + var(--aman-bawah));transform:translateX(-50%) translateY(20px);
+  background:var(--tinta);color:#fff;padding:13px 20px;border-radius:100px;font-weight:600;font-size:14px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:90vw;text-align:center}
+#toast.tampil{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.sukses{background:var(--hijau)}
+#toast.gagal{background:var(--merah)}
+.memuat{padding:40px;text-align:center;color:var(--teks-lembut)}
+.catatan{font-size:13.5px;color:var(--teks-lembut);margin-top:10px;max-width:70ch}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login">
+  <div class="login-kiri">
+    <div>
+      <div class="merek">buahmurah<span class="id">.id</span></div>
+      <p>Catat penjualan di depan, rapikan pembukuan di belakang. Satu tempat untuk kasir dan pemilik.</p>
+    </div>
+    <div class="keranjang">
+      <span>Penjualan harian</span><span>Pengeluaran</span><span>Cashflow</span>
+      <span>Kulakan</span><span>Gaji</span><span>Stok buah</span>
+    </div>
+  </div>
+  <div class="login-kanan">
+    <div class="kotak-login">
+      <h1>Masuk</h1>
+      <p class="sub">Gunakan email dan kata sandi yang diberikan pemilik toko.</p>
+      <div class="pesan" id="pesanLogin"></div>
+      <div class="grup">
+        <label for="email">Email</label>
+        <input id="email" class="isian" type="email" autocomplete="username" inputmode="email" placeholder="nama@email.com">
+      </div>
+      <div class="grup">
+        <label for="sandi">Kata sandi</label>
+        <input id="sandi" class="isian" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="tombol-utama" id="btnMasuk">Masuk</button>
+      <div class="lupa"><button id="btnLupa">Lupa kata sandi</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APLIKASI ================= -->
+<div id="app">
+  <aside class="sisi">
+    <div class="sisi-atas">
+      <div class="merek">buahmurah<span class="id">.id</span></div>
+      <button class="lonceng" aria-label="Notifikasi">🔔<span class="titik">0</span></button>
+    </div>
+    <nav class="menu" id="menu"></nav>
+    <div class="kartu-user">
+      <div class="nm" id="userNama">—</div>
+      <div class="rl" id="userRole">—</div>
+      <button class="pasang" id="btnPasang">Pasang aplikasi</button>
+      <button id="btnKeluar">Keluar</button>
+    </div>
+  </aside>
+  <main>
+    <div class="puncak">
+      <div class="merek">buahmurah<span class="id">.id</span></div>
+      <div class="kanan-atas">
+        <button class="lonceng" aria-label="Notifikasi">🔔<span class="titik">0</span></button>
+        <button class="pasang" id="btnPasangHp" style="background:none;padding:0">Pasang</button>
+        <button id="btnKeluarHp">Keluar</button>
+      </div>
+    </div>
+    <div id="layar"></div>
+  </main>
+  <nav class="nav-bawah" id="navBawah"></nav>
+</div>
+
+<div id="tirai"><div class="modal">
+  <div class="modal-kepala"><h3 id="modalJudul">—</h3><button id="modalTutup" aria-label="Tutup">&times;</button></div>
+  <div class="modal-isi" id="modalIsi"></div>
+  <div class="modal-kaki">
+    <button class="tombol garis" id="modalBatal">Batal</button>
+    <button class="tombol biru" id="modalSimpan">Simpan</button>
+  </div>
+</div></div>
+
+<div id="dialogPasang">
+  <div class="kotak-pasang">
+    <img src="ikon/ikon-192.png" alt="" width="72" height="72">
+    <h3>Pasang buahmurah.id</h3>
+    <p id="pasangKet">Pasang di layar utama supaya terbuka layar penuh seperti aplikasi biasa, lebih cepat dibuka, dan notifikasi dari kasir bisa masuk.</p>
+    <button class="tombol kuning" id="btnPasangSekarang">Instal</button>
+    <button class="tombol garis" id="btnPasangNanti">Nanti saja</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* =====================================================================
+   1. KONFIGURASI — isi dua baris ini dari Supabase > Project Settings > API
+   ===================================================================== */
+const SUPABASE_URL = "https://uuorhkhpubkvsilsybvw.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Ers0TipmzhLN-yENqavlBg_tmOU-Vp6";
+
+const memori = {};
+const penyimpanan = {
+  getItem:k=>{try{return localStorage.getItem(k)}catch(e){return memori[k]??null}},
+  setItem:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){memori[k]=v}},
+  removeItem:k=>{try{localStorage.removeItem(k)}catch(e){delete memori[k]}}
+};
+const terpasang = SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY.length > 20;
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth:{ storage:penyimpanan, persistSession:true, autoRefreshToken:true }
+});
+
+/* =====================================================================
+   2. UTILITAS
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const rp = n => "Rp " + new Intl.NumberFormat("id-ID").format(Math.round(Number(n)||0));
+const angka = n => new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0);
+const tglIndo = d => d ? new Date(d+"T00:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}) : "—";
+const hariIni = () => new Date().toLocaleDateString("sv-SE");
+const bulanIni = () => hariIni().slice(0,7);
+const aman = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---- Format ribuan untuk semua isian nominal ---- */
+function formatUang(teks){
+  const digit = String(teks).replace(/\D/g,"").replace(/^0+(?=\d)/,"");
+  return digit ? Number(digit).toLocaleString("id-ID") : "";
+}
+function pasangUang(el){
+  el.setAttribute("inputmode","numeric");
+  el.setAttribute("autocomplete","off");
+  if(el.value) el.value = formatUang(el.value);
+  el.addEventListener("input", () => {
+    const posisi = el.selectionStart ?? el.value.length;
+    const panjangLama = el.value.length;
+    el.value = formatUang(el.value);
+    const geser = el.value.length - panjangLama;
+    const baru = Math.max(0, posisi + geser);
+    try { el.setSelectionRange(baru, baru); } catch(e){}
+  });
+  el.addEventListener("focus", () => { if(el.value==="0") el.value=""; });
+  el.addEventListener("blur", () => { if(!el.value.trim()) el.value="0"; });
+}
+function siapkanUang(){
+  document.querySelectorAll("input.uang:not([data-uang])").forEach(el => { el.dataset.uang="1"; pasangUang(el); });
+}
+/* Ambil angka murni dari isian berformat ribuan */
+function uang(sel){
+  const el = typeof sel==="string" ? $(sel) : sel;
+  if(!el) return 0;
+  return Number(String(el.value).replace(/\D/g,"")) || 0;
+}
+
+let jamToast;
+function toast(teks, jenis="sukses"){
+  const t=$("#toast"); t.textContent=teks; t.className="tampil "+jenis;
+  clearTimeout(jamToast); jamToast=setTimeout(()=>t.className="",3000);
+}
+
+let sesi=null, profil=null, halaman=null;
+
+/* =====================================================================
+   3. MODAL
+   ===================================================================== */
+let simpanModal=null;
+function bukaModal(judulTeks, isiHTML, saatSimpan, labelSimpan="Simpan"){
+  $("#modalJudul").textContent = judulTeks;
+  $("#modalIsi").innerHTML = isiHTML;
+  simpanModal = saatSimpan;
+  const adaSimpan = typeof saatSimpan === "function";
+  $("#modalSimpan").style.display = adaSimpan ? "" : "none";
+  $("#modalSimpan").textContent = labelSimpan;
+  $("#modalBatal").textContent = adaSimpan ? "Batal" : "Tutup";
+  $("#tirai").classList.add("tampil");
+  siapkanUang();
+  const pertama = $("#modalIsi input, #modalIsi select");
+  if(pertama) setTimeout(()=>pertama.focus(),60);
+}
+function tutupModal(){ $("#tirai").classList.remove("tampil"); simpanModal=null; }
+$("#modalTutup").addEventListener("click", tutupModal);
+$("#modalBatal").addEventListener("click", tutupModal);
+$("#tirai").addEventListener("click", e => { if(e.target===$("#tirai")) tutupModal(); });
+$("#modalSimpan").addEventListener("click", async () => {
+  if(!simpanModal) return;
+  const b=$("#modalSimpan"), label=b.textContent;
+  b.disabled=true; b.textContent="Menyimpan…";
+  try { const hasil = await simpanModal(); if(hasil!==false) tutupModal(); }
+  finally { b.disabled=false; b.textContent=label; }
+});
+
+/* =====================================================================
+   4. LOGIN
+   ===================================================================== */
+function pesanLogin(teks, jenis="salah"){
+  const p=$("#pesanLogin"); p.textContent=teks; p.className="pesan tampil "+jenis;
+}
+if(!terpasang){
+  pesanLogin("Aplikasi belum tersambung. Buka index.html, isi SUPABASE_URL dan SUPABASE_ANON_KEY di bagian KONFIGURASI.","info");
+}
+
+async function masuk(){
+  const email=$("#email").value.trim(), sandi=$("#sandi").value;
+  if(!email||!sandi){ pesanLogin("Email dan kata sandi harus diisi."); return; }
+  const b=$("#btnMasuk"); b.disabled=true; b.textContent="Memeriksa…";
+  const { data, error } = await sb.auth.signInWithPassword({ email, password:sandi });
+  b.disabled=false; b.textContent="Masuk";
+  if(error){
+    pesanLogin(error.message.includes("Invalid login")
+      ? "Email atau kata sandi tidak cocok. Coba lagi."
+      : "Gagal masuk: "+error.message);
+    return;
+  }
+  await mulaiSesi(data.session);
+}
+$("#btnMasuk").addEventListener("click", masuk);
+$("#sandi").addEventListener("keydown", e => { if(e.key==="Enter") masuk(); });
+$("#email").addEventListener("keydown", e => { if(e.key==="Enter") $("#sandi").focus(); });
+
+$("#btnLupa").addEventListener("click", async () => {
+  const email=$("#email").value.trim();
+  if(!email) return pesanLogin("Isi dulu emailnya, lalu tekan Lupa kata sandi.");
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
+  pesanLogin(error ? "Gagal mengirim: "+error.message
+    : "Link penggantian kata sandi sudah dikirim ke "+email+". Cek juga folder spam.", error?"salah":"info");
+});
+
+async function keluar(){
+  hentikanNotifikasi();
+  await sb.auth.signOut();
+  sesi=null; profil=null;
+  $("#app").classList.remove("tampil");
+  $("#login").style.display="grid";
+  $("#sandi").value="";
+  $("#pesanLogin").className="pesan";
+}
+$("#btnKeluar").addEventListener("click", keluar);
+$("#btnKeluarHp").addEventListener("click", keluar);
+
+async function mulaiSesi(s){
+  sesi=s;
+  const { data, error } = await sb.from("profiles").select("*").eq("id", s.user.id).single();
+  if(error||!data){
+    pesanLogin("Profil pengguna belum dibuat. Jalankan supabase-setup.sql lalu masuk lagi.");
+    await sb.auth.signOut(); return;
+  }
+  profil = data;
+  $("#login").style.display="none";
+  $("#app").classList.add("tampil");
+  $("#userNama").textContent = profil.nama || s.user.email;
+  $("#userRole").textContent = (profil.jabatan ? profil.jabatan+" · " : "") +
+    (profil.role==="manajemen" ? "Manajemen" : "Kasir");
+  bangunMenu();
+  mulaiNotifikasi();
+}
+
+/* =====================================================================
+   5. MENU & HAK AKSES
+   ===================================================================== */
+const SEMUA_MENU = {
+  penjualan:     {label:"Penjualan",        ikon:"🍎", grup:"Kasir"},
+  pengeluaran:   {label:"Pengeluaran",      ikon:"💸", grup:"Kasir"},
+  riwayat:       {label:"Riwayat",          ikon:"🧾", grup:"Kasir"},
+  ringkasan:     {label:"Ringkasan",        ikon:"📊", grup:"Manajemen"},
+  cashflow:      {label:"Cashflow",         ikon:"💰", grup:"Pembukuan"},
+  kulakan:       {label:"Kulakan",          ikon:"🚚", grup:"Pembukuan"},
+  gaji:          {label:"Gaji",             ikon:"👤", grup:"Pembukuan"},
+  stock_opname:  {label:"Stock Opname",     ikon:"📋", grup:"Gudang"},
+  stock_buah:    {label:"Stock Buah",       ikon:"🍇", grup:"Gudang"},
+  penjualan_m:   {label:"Data Penjualan",   ikon:"📈", grup:"Data kasir"},
+  pengeluaran_m: {label:"Data Pengeluaran", ikon:"📉", grup:"Data kasir"},
+  pengguna:      {label:"Pengguna",         ikon:"👥", grup:"Pengaturan", khususManajemen:true},
+  profil:        {label:"Akun saya",        ikon:"⚙️", grup:"Pengaturan"}
+};
+const URUTAN = Object.keys(SEMUA_MENU);
+const BAWAAN = {
+  kasir:     ["penjualan","pengeluaran","riwayat","profil"],
+  manajemen: ["ringkasan","cashflow","kulakan","gaji","stock_opname","stock_buah",
+              "penjualan_m","pengeluaran_m","pengguna","profil"]
+};
+
+function menuSaya(){
+  const pilihan = (profil.hak_akses && profil.hak_akses.length) ? profil.hak_akses : BAWAAN[profil.role];
+  let daftar = URUTAN.filter(id => pilihan.includes(id));
+  if(profil.role!=="manajemen") daftar = daftar.filter(id => !SEMUA_MENU[id].khususManajemen);
+  if(!daftar.includes("profil")) daftar.push("profil");
+  return daftar.length ? daftar : ["profil"];
+}
+
+function bangunMenu(){
+  const daftar = menuSaya();
+  let grupTerakhir=null;
+  $("#menu").innerHTML = daftar.map(id => {
+    const m=SEMUA_MENU[id];
+    const kepala = m.grup!==grupTerakhir ? `<div class="pisah">${m.grup}</div>` : "";
+    grupTerakhir=m.grup;
+    return kepala + `<button data-hal="${id}"><span class="ikon">${m.ikon}</span>${m.label}</button>`;
+  }).join("");
+  $("#navBawah").innerHTML = daftar.map(id =>
+    `<button data-hal="${id}"><span class="ikon">${SEMUA_MENU[id].ikon}</span>${SEMUA_MENU[id].label}</button>`).join("");
+  document.querySelectorAll("[data-hal]").forEach(b => b.addEventListener("click", () => buka(b.dataset.hal)));
+
+  const diminta = new URLSearchParams(location.search).get("hal");
+  buka(daftar.includes(diminta) ? diminta : daftar[0]);
+}
+
+function buka(id){
+  halaman = id;
+  document.querySelectorAll("[data-hal]").forEach(b => b.classList.toggle("aktif", b.dataset.hal===id));
+  $("#layar").innerHTML = `<div class="memuat">Memuat…</div>`;
+  window.scrollTo({top:0});
+  const peta = {
+    penjualan:layarPenjualan, pengeluaran:layarPengeluaran, riwayat:layarRiwayat,
+    ringkasan:layarRingkasan, cashflow:()=>layarBuku("cashflow"), kulakan:()=>layarBuku("kulakan"),
+    gaji:layarGaji, stock_opname:layarOpname, stock_buah:layarStokBuah,
+    penjualan_m:()=>layarDataKasir("penjualan"), pengeluaran_m:()=>layarDataKasir("pengeluaran"),
+    pengguna:layarPengguna, profil:layarProfil
+  };
+  (peta[id]||layarProfil)();
+}
+
+const judul = (h,p) => `<div class="judul"><div><h2>${h}</h2><p>${p}</p></div></div>`;
+const kosong = (t,s) => `<div class="kosong"><strong>${t}</strong>${s}</div>`;
+
+/* =====================================================================
+   6. KASIR — PENJUALAN
+   ===================================================================== */
+let bayarTerpilih = null;
+
+async function layarPenjualan(){
+  const { data:buah } = await sb.from("jenis_buah").select("*").eq("aktif",true).order("nama");
+  const pilihan = (buah||[]).map(b =>
+    `<option value="${aman(b.nama)}" data-harga="${b.harga}" data-satuan="${aman(b.satuan)}">${aman(b.nama)}</option>`).join("");
+  bayarTerpilih = null;
+
+  $("#layar").innerHTML = judul("Penjualan", "Catat setiap buah yang terjual hari ini.") + `
+  <div class="kasir">
+    <div class="papan"><div class="papan-isi">
+      <div class="grup">
+        <label for="fBuah">Jenis buah</label>
+        <select id="fBuah" class="isian" style="height:48px">
+          <option value="">— pilih buah —</option>${pilihan}
+        </select>
+      </div>
+      <div class="baris2">
+        <div class="grup">
+          <label for="fQty">Jumlah</label>
+          <div class="stepper">
+            <button type="button" id="qKurang" aria-label="Kurangi">−</button>
+            <input id="fQty" class="num" type="number" step="0.5" min="0" value="1" inputmode="decimal">
+            <button type="button" id="qTambah" aria-label="Tambah" style="border-radius:0">+</button>
+            <span class="satuan-tag" id="fSatuan">Kg</span>
+          </div>
+        </div>
+        <div class="grup">
+          <label for="fHarga">Harga per satuan</label>
+          <div class="dengan-satuan">
+            <span class="satuan-tag satuan-awal">Rp</span>
+            <input id="fHarga" class="isian num uang" type="text" value="0">
+          </div>
+        </div>
+      </div>
+      <div class="total-bar">
+        <span class="lb">Total dibayar</span>
+        <span class="ag num" id="fTotal">Rp 0</span>
+      </div>
+      <div class="grup">
+        <label>Pembayaran <span style="font-weight:400;color:var(--teks-lembut)">— wajib dipilih</span></label>
+        <div class="pilih-bayar" id="pilihBayar">
+          <button type="button" data-bayar="Cash">Cash</button>
+          <button type="button" data-bayar="Transfer">Transfer</button>
+        </div>
+        <div class="kotak-transfer" id="kotakTransfer">
+          <label for="fBukti">Bukti transfer</label>
+          <input id="fBukti" class="isian" type="file" accept="image/*" capture="environment" style="padding:9px;background:#fff">
+          <div class="ket">Boleh dilewati. Foto struk atau tangkapan layar m-banking bisa diunggah nanti.</div>
+        </div>
+      </div>
+      <button class="tombol kuning" id="btnJual" style="width:100%;padding:15px;font-size:16px">Simpan penjualan</button>
+    </div></div>
+
+    <div class="ringkas">
+      <div class="stat tegas"><div class="lb">Penjualan hari ini</div><div class="ag num" id="sJual">Rp 0</div></div>
+      <div class="stat"><div class="lb">Jumlah transaksi</div><div class="ag num" id="sTrx">0</div></div>
+      <div class="stat"><div class="lb">Pengeluaran hari ini</div><div class="ag num" id="sKeluar">Rp 0</div></div>
+    </div>
+  </div>`;
+  siapkanUang();
+
+  const fBuah=$("#fBuah"), fQty=$("#fQty"), fHarga=$("#fHarga");
+  const hitung = () => $("#fTotal").textContent = rp((+fQty.value||0)*uang(fHarga));
+  fBuah.addEventListener("change", () => {
+    const o=fBuah.selectedOptions[0];
+    if(o&&o.dataset.harga){ fHarga.value=formatUang(o.dataset.harga); $("#fSatuan").textContent=o.dataset.satuan||"Kg"; }
+    hitung();
+  });
+  fQty.addEventListener("input",hitung);
+  fHarga.addEventListener("input",hitung);
+  $("#qKurang").addEventListener("click",()=>{ fQty.value=Math.max(0,(+fQty.value||0)-0.5); hitung(); });
+  $("#qTambah").addEventListener("click",()=>{ fQty.value=(+fQty.value||0)+0.5; hitung(); });
+
+  document.querySelectorAll("[data-bayar]").forEach(b => b.addEventListener("click", () => {
+    bayarTerpilih = b.dataset.bayar;
+    document.querySelectorAll("[data-bayar]").forEach(x => x.classList.toggle("aktif", x.dataset.bayar===bayarTerpilih));
+    $("#pilihBayar").classList.remove("perlu");
+    $("#kotakTransfer").classList.toggle("tampil", bayarTerpilih==="Transfer");
+  }));
+
+  $("#btnJual").addEventListener("click", async () => {
+    if(!fBuah.value) return toast("Pilih jenis buah dulu.","gagal");
+    if(!(+fQty.value>0)) return toast("Jumlah harus lebih dari nol.","gagal");
+    if(!(uang(fHarga)>0)) return toast("Harga belum diisi.","gagal");
+    if(!bayarTerpilih){
+      $("#pilihBayar").classList.add("perlu");
+      return toast("Pilih dulu: Cash atau Transfer.","gagal");
+    }
+    const b=$("#btnJual"); b.disabled=true; b.textContent="Menyimpan…";
+
+    let bukti=null;
+    const berkas=$("#fBukti").files[0];
+    if(bayarTerpilih==="Transfer" && berkas){
+      const path=`penjualan/${Date.now()}-${berkas.name.replace(/[^\w.\-]/g,"_")}`;
+      const { error:eUp } = await sb.storage.from("bukti").upload(path, berkas);
+      if(eUp){ b.disabled=false; b.textContent="Simpan penjualan"; return toast("Bukti gagal diunggah: "+eUp.message,"gagal"); }
+      bukti = sb.storage.from("bukti").getPublicUrl(path).data.publicUrl;
+    }
+
+    const { error } = await sb.from("penjualan").insert({
+      tanggal:hariIni(), jenis_buah:fBuah.value, qty:+fQty.value,
+      satuan:$("#fSatuan").textContent, harga:uang(fHarga),
+      pembayaran:bayarTerpilih, bukti_url:bukti, user_id:sesi.user.id
+    });
+    b.disabled=false; b.textContent="Simpan penjualan";
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+
+    toast("Penjualan tersimpan");
+    fBuah.value=""; fQty.value=1; fHarga.value="0"; $("#fSatuan").textContent="Kg"; $("#fBukti").value="";
+    bayarTerpilih=null;
+    document.querySelectorAll("[data-bayar]").forEach(x=>x.classList.remove("aktif"));
+    $("#kotakTransfer").classList.remove("tampil");
+    hitung(); muatStatHarian();
+  });
+
+  muatStatHarian();
+}
+
+async function muatStatHarian(){
+  const t=hariIni();
+  const [j,k] = await Promise.all([
+    sb.from("penjualan").select("total").eq("tanggal",t),
+    sb.from("pengeluaran").select("nominal").eq("tanggal",t)
+  ]);
+  const tot=(j.data||[]).reduce((a,b)=>a+Number(b.total||0),0);
+  const kel=(k.data||[]).reduce((a,b)=>a+Number(b.nominal||0),0);
+  if($("#sJual")) $("#sJual").textContent=rp(tot);
+  if($("#sTrx")) $("#sTrx").textContent=(j.data||[]).length;
+  if($("#sKeluar")) $("#sKeluar").textContent=rp(kel);
+}
+
+/* =====================================================================
+   7. KASIR — PENGELUARAN
+   ===================================================================== */
+async function layarPengeluaran(){
+  $("#layar").innerHTML = judul("Pengeluaran", "Uang keluar dari laci kasir: parkir, plastik, bensin, dan lainnya.") + `
+  <div class="kasir">
+    <div class="papan"><div class="papan-isi">
+      <div class="grup">
+        <label for="gKet">Keterangan</label>
+        <input id="gKet" class="isian" style="height:48px" placeholder="Beli plastik kemasan">
+      </div>
+      <div class="grup">
+        <label for="gNom">Nominal</label>
+        <div class="dengan-satuan">
+          <span class="satuan-tag satuan-awal">Rp</span>
+          <input id="gNom" class="isian num uang" type="text" value="0">
+        </div>
+      </div>
+      <button class="tombol kuning" id="btnKeluarSimpan" style="width:100%;padding:15px;font-size:16px">Simpan pengeluaran</button>
+    </div></div>
+    <div class="ringkas">
+      <div class="stat tegas"><div class="lb">Pengeluaran hari ini</div><div class="ag num" id="sKeluar">Rp 0</div></div>
+      <div class="stat"><div class="lb">Penjualan hari ini</div><div class="ag num" id="sJual">Rp 0</div></div>
+    </div>
+  </div>
+  <div class="papan" style="margin-top:22px">
+    <div class="kepala-papan"><h3>Pengeluaran hari ini</h3></div>
+    <div class="gulung" id="tabelKeluar"><div class="memuat">Memuat…</div></div>
+  </div>`;
+  siapkanUang();
+
+  $("#btnKeluarSimpan").addEventListener("click", async () => {
+    const ket=$("#gKet").value.trim(), nom=uang("#gNom");
+    if(!ket) return toast("Isi keterangannya dulu.","gagal");
+    if(!(nom>0)) return toast("Nominal harus lebih dari nol.","gagal");
+    const b=$("#btnKeluarSimpan"); b.disabled=true; b.textContent="Menyimpan…";
+    const { error } = await sb.from("pengeluaran").insert({
+      tanggal:hariIni(), keterangan:ket, nominal:nom, user_id:sesi.user.id });
+    b.disabled=false; b.textContent="Simpan pengeluaran";
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+    toast("Pengeluaran tersimpan");
+    $("#gKet").value=""; $("#gNom").value="0";
+    muatStatHarian(); muatTabelKeluar();
+  });
+
+  muatStatHarian(); muatTabelKeluar();
+}
+
+async function muatTabelKeluar(){
+  const { data } = await sb.from("pengeluaran").select("*").eq("tanggal",hariIni()).order("created_at",{ascending:false});
+  const w=$("#tabelKeluar"); if(!w) return;
+  if(!data||!data.length){ w.innerHTML=kosong("Belum ada pengeluaran","Catatan hari ini masih bersih."); return; }
+  w.innerHTML = `<table><thead><tr><th>Jam</th><th>Keterangan</th><th class="kanan">Nominal</th></tr></thead><tbody>` +
+    data.map(r=>`<tr>
+      <td>${new Date(r.created_at).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}</td>
+      <td>${aman(r.keterangan)}</td>
+      <td class="kanan">${rp(r.nominal)}</td></tr>`).join("") + `</tbody></table>`;
+}
+
+/* =====================================================================
+   8. KASIR — RIWAYAT
+   ===================================================================== */
+async function layarRiwayat(){
+  const { data:jual } = await sb.from("penjualan").select("*").order("created_at",{ascending:false}).limit(100);
+  const { data:keluar } = await sb.from("pengeluaran").select("*").order("created_at",{ascending:false}).limit(100);
+  const totJual=(jual||[]).reduce((a,b)=>a+Number(b.total||0),0);
+
+  $("#layar").innerHTML = judul("Riwayat", "100 catatan terakhir yang kamu masukkan.") + `
+  <div class="papan">
+    <div class="kepala-papan"><h3>Penjualan</h3><span class="ket num">Total ${rp(totJual)}</span></div>
+    <div class="gulung">${ (jual&&jual.length) ? `
+      <table><thead><tr><th>Tanggal</th><th>Buah</th><th class="kanan">Qty</th><th class="kanan">Harga</th><th class="kanan">Total</th><th>Bayar</th><th>Bukti</th></tr></thead><tbody>` +
+      jual.map(r=>`<tr>
+        <td>${tglIndo(r.tanggal)}</td><td>${aman(r.jenis_buah)}</td>
+        <td class="kanan">${angka(r.qty)} ${aman(r.satuan)}</td>
+        <td class="kanan">${rp(r.harga)}</td><td class="kanan">${rp(r.total)}</td>
+        <td><span class="lencana ${r.pembayaran==="Cash"?"cash":"tf"}">${aman(r.pembayaran)}</span></td>
+        <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat</a>`:"—"}</td>
+      </tr>`).join("")+`</tbody></table>` : kosong("Belum ada penjualan","Mulai dari menu Penjualan.") }
+    </div>
+  </div>
+  <div class="papan" style="margin-top:22px">
+    <div class="kepala-papan"><h3>Pengeluaran</h3></div>
+    <div class="gulung">${ (keluar&&keluar.length) ? `
+      <table><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="kanan">Nominal</th></tr></thead><tbody>` +
+      keluar.map(r=>`<tr><td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td><td class="kanan">${rp(r.nominal)}</td></tr>`).join("")+
+      `</tbody></table>` : kosong("Belum ada pengeluaran","Catatan masih kosong.") }
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   9. MANAJEMEN — RINGKASAN
+   ===================================================================== */
+async function layarRingkasan(){
+  const b=bulanIni();
+  const [j,k,cf,kl,st] = await Promise.all([
+    sb.from("penjualan").select("total,pembayaran").gte("tanggal",b+"-01"),
+    sb.from("pengeluaran").select("nominal").gte("tanggal",b+"-01"),
+    sb.from("cashflow").select("debit,kredit"),
+    sb.from("kulakan").select("debit,kredit"),
+    sb.from("stock_buah").select("jumlah")
+  ]);
+  const totJual=(j.data||[]).reduce((a,x)=>a+Number(x.total||0),0);
+  const tunai=(j.data||[]).filter(x=>x.pembayaran==="Cash").reduce((a,x)=>a+Number(x.total||0),0);
+  const totKel=(k.data||[]).reduce((a,x)=>a+Number(x.nominal||0),0);
+  const saldoCf=(cf.data||[]).reduce((a,x)=>a+Number(x.debit||0)-Number(x.kredit||0),0);
+  const saldoKl=(kl.data||[]).reduce((a,x)=>a+Number(x.debit||0)-Number(x.kredit||0),0);
+  const totStok=(st.data||[]).reduce((a,x)=>a+Number(x.jumlah||0),0);
+  const namaBulan=new Date(b+"-01T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"});
+
+  $("#layar").innerHTML = judul("Ringkasan", "Kondisi toko bulan "+namaBulan+".") + `
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px">
+    <div class="stat tegas"><div class="lb">Penjualan bulan ini</div><div class="ag num">${rp(totJual)}</div></div>
+    <div class="stat"><div class="lb">Diterima tunai</div><div class="ag num">${rp(tunai)}</div></div>
+    <div class="stat"><div class="lb">Diterima transfer</div><div class="ag num">${rp(totJual-tunai)}</div></div>
+    <div class="stat"><div class="lb">Pengeluaran kasir</div><div class="ag num">${rp(totKel)}</div></div>
+    <div class="stat"><div class="lb">Saldo cashflow</div><div class="ag num">${rp(saldoCf)}</div></div>
+    <div class="stat"><div class="lb">Saldo kulakan</div><div class="ag num">${rp(saldoKl)}</div></div>
+    <div class="stat"><div class="lb">Total stok tercatat</div><div class="ag num">${angka(totStok)} Kg</div></div>
+  </div>
+  <div class="papan" style="margin-top:22px"><div class="papan-isi">
+    <h3 style="font-size:16px;margin-bottom:6px">Cara pakai</h3>
+    <p class="catatan">Kasir mengisi Penjualan dan Pengeluaran dari HP mereka. Angka di atas ikut bergerak begitu
+    mereka menyimpan. Cashflow, Kulakan, Gaji, Stok, dan Pengguna hanya bisa diubah dari akun manajemen.</p>
+  </div></div>`;
+}
+
+/* =====================================================================
+   10. MANAJEMEN — CASHFLOW & KULAKAN
+   ===================================================================== */
+async function layarBuku(tabel){
+  const nama = tabel==="cashflow" ? "Cashflow" : "Kulakan";
+  const ket  = tabel==="cashflow"
+    ? "Semua uang masuk dan keluar toko. Debit menambah saldo, kredit mengurangi."
+    : "Belanja buah ke supplier. Debit untuk pengembalian, kredit untuk pembelian.";
+
+  $("#layar").innerHTML = judul(nama, ket) + `
+  <div class="papan">
+    <div class="kepala-papan">
+      <h3>Buku ${nama}</h3>
+      <button class="tombol kuning" id="btnBuka">Tambah baris</button>
+    </div>
+    <div class="form-tambah" id="formTambah">
+      <div class="kisi">
+        <div><label>Nomor</label><input id="iNomor" class="isian num" type="number" min="1"></div>
+        <div><label>Tanggal</label><input id="iTgl" class="isian" type="date" value="${hariIni()}"></div>
+        <div style="grid-column:span 2"><label>Keterangan</label><input id="iKet" class="isian" placeholder="Setoran penjualan harian"></div>
+        <div><label>Debit (masuk)</label><input id="iDebit" class="isian num uang" type="text" value="0"></div>
+        <div><label>Kredit (keluar)</label><input id="iKredit" class="isian num uang" type="text" value="0"></div>
+        <div><label>Bukti transaksi</label><input id="iBukti" class="isian" type="file" accept="image/*,application/pdf" style="padding:9px"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="tombol biru" id="btnSimpan">Simpan baris</button>
+        <button class="tombol garis" id="btnBatal">Batal</button>
+      </div>
+    </div>
+    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
+  </div>`;
+  siapkanUang();
+
+  const form=$("#formTambah");
+  $("#btnBuka").addEventListener("click", async () => {
+    form.classList.toggle("buka");
+    if(form.classList.contains("buka")){
+      const { data } = await sb.from(tabel).select("nomor").order("nomor",{ascending:false}).limit(1);
+      $("#iNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
+      $("#iKet").focus();
+    }
+  });
+  $("#btnBatal").addEventListener("click", () => form.classList.remove("buka"));
+
+  $("#btnSimpan").addEventListener("click", async () => {
+    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
+    let bukti=null;
+    const berkas=$("#iBukti").files[0];
+    if(berkas){
+      const path=`${tabel}/${Date.now()}-${berkas.name.replace(/[^\w.\-]/g,"_")}`;
+      const { error:eUp } = await sb.storage.from("bukti").upload(path, berkas);
+      if(eUp){ b.disabled=false; b.textContent="Simpan baris"; return toast("Bukti gagal diunggah: "+eUp.message,"gagal"); }
+      bukti = sb.storage.from("bukti").getPublicUrl(path).data.publicUrl;
+    }
+    const { error } = await sb.from(tabel).insert({
+      nomor:+$("#iNomor").value||1, tanggal:$("#iTgl").value||hariIni(),
+      keterangan:$("#iKet").value.trim(), debit:uang("#iDebit"),
+      kredit:uang("#iKredit"), bukti_url:bukti
+    });
+    b.disabled=false; b.textContent="Simpan baris";
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+    toast("Baris tersimpan");
+    form.classList.remove("buka");
+    $("#iKet").value=""; $("#iDebit").value="0"; $("#iKredit").value="0"; $("#iBukti").value="";
+    muatBuku(tabel);
+  });
+
+  muatBuku(tabel);
+}
+
+async function muatBuku(tabel){
+  const { data, error } = await sb.from(tabel).select("*").order("nomor",{ascending:true});
+  const w=$("#isiTabel"); if(!w) return;
+  if(error){ w.innerHTML=kosong("Tidak bisa memuat data",aman(error.message)); return; }
+  if(!data||!data.length){ w.innerHTML=kosong("Buku masih kosong","Tekan Tambah baris untuk mencatat transaksi pertama."); return; }
+  let saldo=0;
+  const baris=data.map(r=>{
+    saldo += Number(r.debit||0)-Number(r.kredit||0);
+    return `<tr>
+      <td class="num">${r.nomor}</td>
+      <td>${tglIndo(r.tanggal)}</td>
+      <td>${aman(r.keterangan)||"—"}</td>
+      <td class="kanan">${Number(r.debit)?rp(r.debit):"—"}</td>
+      <td class="kanan">${Number(r.kredit)?rp(r.kredit):"—"}</td>
+      <td class="kanan saldo-sel">${rp(saldo)}</td>
+      <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat bukti</a>`:"—"}</td>
+      <td><button class="hapus" data-id="${r.id}">Hapus</button></td>
+    </tr>`;
+  }).join("");
+  w.innerHTML = `<table><thead><tr>
+      <th>Nomor</th><th>Tanggal</th><th>Keterangan</th><th class="kanan">Debit</th>
+      <th class="kanan">Kredit</th><th class="kanan">Saldo</th><th>Bukti Transaksi</th><th></th>
+    </tr></thead><tbody>${baris}</tbody>
+    <tfoot><tr><th colspan="5" class="kanan">Saldo akhir</th><th class="kanan num">${rp(saldo)}</th><th colspan="2"></th></tr></tfoot></table>`;
+  pasangHapus(tabel, ()=>muatBuku(tabel));
+}
+
+function pasangHapus(tabel, muatUlang){
+  document.querySelectorAll(".hapus[data-id]").forEach(b => b.addEventListener("click", async () => {
+    if(!confirm("Hapus baris ini? Tindakan tidak bisa dibatalkan.")) return;
+    const { error } = await sb.from(tabel).delete().eq("id", b.dataset.id);
+    if(error) return toast("Gagal menghapus: "+error.message,"gagal");
+    toast("Baris dihapus"); muatUlang();
+  }));
+}
+
+/* =====================================================================
+   11. MANAJEMEN — GAJI
+   ===================================================================== */
+async function layarGaji(){
+  $("#layar").innerHTML = judul("Gaji", "Rekap upah bulanan berdasarkan kehadiran dan kasbon.") + `
+  <div class="papan">
+    <div class="kepala-papan"><h3>Daftar gaji</h3>
+      <button class="tombol kuning" id="btnBuka">Tambah gaji</button></div>
+    <div class="form-tambah" id="formTambah">
+      <div class="kisi">
+        <div><label>Nomor</label><input id="gNomor" class="isian num" type="number" min="1"></div>
+        <div><label>Nama karyawan</label><input id="gNama" class="isian" placeholder="Nama"></div>
+        <div><label>Bulan</label><input id="gBulan" class="isian" type="month" value="${bulanIni()}"></div>
+        <div><label>Absensi (hari masuk)</label><input id="gAbsen" class="isian num" type="number" min="0" value="0"></div>
+        <div><label>Total hari kerja</label><input id="gHari" class="isian num" type="number" min="0" value="26"></div>
+        <div><label>Upah per hari</label><input id="gUpah" class="isian num uang" type="text" value="0"></div>
+        <div><label>Kasbon</label><input id="gKasbon" class="isian num uang" type="text" value="0"></div>
+        <div><label>Total diterima</label><input id="gTotal" class="isian num uang" type="text" value="0"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="tombol biru" id="btnSimpan">Simpan gaji</button>
+        <button class="tombol garis" id="btnBatal">Batal</button>
+      </div>
+    </div>
+    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
+  </div>`;
+  siapkanUang();
+
+  const hitungTotal = () => {
+    const t=(+$("#gAbsen").value||0)*uang("#gUpah")-uang("#gKasbon");
+    $("#gTotal").value=formatUang(String(Math.max(0,t)));
+  };
+  ["gAbsen","gUpah","gKasbon"].forEach(i=>$("#"+i).addEventListener("input",hitungTotal));
+
+  const form=$("#formTambah");
+  $("#btnBuka").addEventListener("click", async () => {
+    form.classList.toggle("buka");
+    if(form.classList.contains("buka")){
+      const { data } = await sb.from("gaji").select("nomor").order("nomor",{ascending:false}).limit(1);
+      $("#gNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
+      $("#gNama").focus();
+    }
+  });
+  $("#btnBatal").addEventListener("click",()=>form.classList.remove("buka"));
+
+  $("#btnSimpan").addEventListener("click", async () => {
+    if(!$("#gNama").value.trim()) return toast("Nama karyawan belum diisi.","gagal");
+    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
+    const { error } = await sb.from("gaji").insert({
+      nomor:+$("#gNomor").value||1, nama:$("#gNama").value.trim(), bulan:$("#gBulan").value||bulanIni(),
+      absensi:+$("#gAbsen").value||0, total_hari:+$("#gHari").value||0,
+      kasbon:uang("#gKasbon"), total:uang("#gTotal")
+    });
+    b.disabled=false; b.textContent="Simpan gaji";
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+    toast("Data gaji tersimpan"); form.classList.remove("buka"); muatGaji();
+  });
+
+  muatGaji();
+}
+
+async function muatGaji(){
+  const { data } = await sb.from("gaji").select("*").order("bulan",{ascending:false}).order("nomor");
+  const w=$("#isiTabel"); if(!w) return;
+  if(!data||!data.length){ w.innerHTML=kosong("Belum ada data gaji","Tambahkan rekap upah bulan berjalan."); return; }
+  w.innerHTML = `<table><thead><tr>
+      <th>Nomor</th><th>Nama</th><th>Bulan</th><th class="kanan">Absensi / Total Hari</th>
+      <th class="kanan">Kasbon</th><th class="kanan">Total</th><th></th></tr></thead><tbody>` +
+    data.map(r=>`<tr>
+      <td class="num">${r.nomor}</td><td>${aman(r.nama)||"—"}</td>
+      <td>${new Date(r.bulan+"-01T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</td>
+      <td class="kanan">${r.absensi} / ${r.total_hari}</td>
+      <td class="kanan">${rp(r.kasbon)}</td>
+      <td class="kanan saldo-sel">${rp(r.total)}</td>
+      <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+  pasangHapus("gaji", muatGaji);
+}
+
+/* =====================================================================
+   12. MANAJEMEN — STOCK OPNAME
+   ===================================================================== */
+async function layarOpname(){
+  $("#layar").innerHTML = judul("Stock Opname", "Hasil pengecekan fisik barang di gudang.") + `
+  <div class="papan">
+    <div class="kepala-papan"><h3>Catatan opname</h3>
+      <button class="tombol kuning" id="btnBuka">Tambah catatan</button></div>
+    <div class="form-tambah" id="formTambah">
+      <div class="kisi">
+        <div><label>Nomor</label><input id="oNomor" class="isian num" type="number" min="1"></div>
+        <div><label>Tanggal</label><input id="oTgl" class="isian" type="date" value="${hariIni()}"></div>
+        <div style="grid-column:span 2"><label>Keterangan</label><input id="oKet" class="isian" placeholder="Apel Fuji 3 Kg lembek"></div>
+        <div><label>Kondisi</label>
+          <select id="oKondisi" class="isian"><option>Baik</option><option>Rusak</option></select></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="tombol biru" id="btnSimpan">Simpan catatan</button>
+        <button class="tombol garis" id="btnBatal">Batal</button>
+      </div>
+    </div>
+    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
+  </div>`;
+
+  const form=$("#formTambah");
+  $("#btnBuka").addEventListener("click", async () => {
+    form.classList.toggle("buka");
+    if(form.classList.contains("buka")){
+      const { data } = await sb.from("stock_opname").select("nomor").order("nomor",{ascending:false}).limit(1);
+      $("#oNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
+      $("#oKet").focus();
+    }
+  });
+  $("#btnBatal").addEventListener("click",()=>form.classList.remove("buka"));
+  $("#btnSimpan").addEventListener("click", async () => {
+    if(!$("#oKet").value.trim()) return toast("Keterangan belum diisi.","gagal");
+    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
+    const { error } = await sb.from("stock_opname").insert({
+      nomor:+$("#oNomor").value||1, tanggal:$("#oTgl").value||hariIni(),
+      keterangan:$("#oKet").value.trim(), kondisi:$("#oKondisi").value });
+    b.disabled=false; b.textContent="Simpan catatan";
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+    toast("Catatan tersimpan"); form.classList.remove("buka"); $("#oKet").value=""; muatOpname();
+  });
+  muatOpname();
+}
+
+async function muatOpname(){
+  const { data } = await sb.from("stock_opname").select("*").order("nomor",{ascending:true});
+  const w=$("#isiTabel"); if(!w) return;
+  if(!data||!data.length){ w.innerHTML=kosong("Belum ada opname","Catat hasil pengecekan gudang pertama."); return; }
+  w.innerHTML = `<table><thead><tr>
+      <th>Nomor</th><th>Tanggal</th><th>Keterangan</th><th>Kondisi</th><th></th></tr></thead><tbody>` +
+    data.map(r=>`<tr>
+      <td class="num">${r.nomor}</td><td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td>
+      <td><span class="lencana ${r.kondisi==="Baik"?"baik":"rusak"}">${r.kondisi}</span></td>
+      <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+  pasangHapus("stock_opname", muatOpname);
+}
+
+/* =====================================================================
+   13. MANAJEMEN — STOCK BUAH
+   ===================================================================== */
+async function layarStokBuah(){
+  $("#layar").innerHTML = judul("Stock Buah", "Sisa barang per jenis buah. Ubah jumlahnya langsung di kolom.") + `
+  <div class="papan">
+    <div class="kepala-papan"><h3>Persediaan</h3>
+      <button class="tombol kuning" id="btnBuka">Tambah jenis</button></div>
+    <div class="form-tambah" id="formTambah">
+      <div class="kisi">
+        <div><label>Jenis buah</label><input id="bNama" class="isian" placeholder="Durian Montong"></div>
+        <div><label>Jumlah</label><input id="bJumlah" class="isian num" type="number" min="0" step="0.5" value="0"></div>
+        <div><label>Satuan</label>
+          <select id="bSatuan" class="isian"><option>Kg</option><option>Pcs</option><option>Peti</option><option>Ikat</option></select></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="tombol biru" id="btnSimpan">Simpan jenis</button>
+        <button class="tombol garis" id="btnBatal">Batal</button>
+      </div>
+    </div>
+    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
+  </div>`;
+
+  const form=$("#formTambah");
+  $("#btnBuka").addEventListener("click",()=>{ form.classList.toggle("buka"); if(form.classList.contains("buka")) $("#bNama").focus(); });
+  $("#btnBatal").addEventListener("click",()=>form.classList.remove("buka"));
+  $("#btnSimpan").addEventListener("click", async () => {
+    if(!$("#bNama").value.trim()) return toast("Nama buah belum diisi.","gagal");
+    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
+    const { error } = await sb.from("stock_buah").insert({
+      jenis_buah:$("#bNama").value.trim(), jumlah:+$("#bJumlah").value||0, satuan:$("#bSatuan").value });
+    b.disabled=false; b.textContent="Simpan jenis";
+    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
+    toast("Jenis buah ditambahkan"); form.classList.remove("buka"); $("#bNama").value=""; $("#bJumlah").value=0; muatStokBuah();
+  });
+  muatStokBuah();
+}
+
+async function muatStokBuah(){
+  const { data } = await sb.from("stock_buah").select("*").order("jenis_buah");
+  const w=$("#isiTabel"); if(!w) return;
+  if(!data||!data.length){ w.innerHTML=kosong("Belum ada persediaan","Tambahkan jenis buah yang kamu jual."); return; }
+  w.innerHTML = `<table><thead><tr>
+      <th>Jenis Buah</th><th class="kanan">Jumlah</th><th>Satuan</th><th></th><th></th></tr></thead><tbody>` +
+    data.map(r=>`<tr>
+      <td>${aman(r.jenis_buah)}</td>
+      <td class="kanan"><input class="isian num ubah-jumlah" data-id="${r.id}" type="number" step="0.5" min="0"
+           value="${r.jumlah}" style="width:110px;padding:7px 10px;text-align:right"></td>
+      <td>${aman(r.satuan)}</td>
+      <td><button class="tombol garis simpan-jumlah" data-id="${r.id}" style="padding:6px 13px;font-size:13px">Simpan</button></td>
+      <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+
+  document.querySelectorAll(".simpan-jumlah").forEach(b => b.addEventListener("click", async () => {
+    const inp=document.querySelector(`.ubah-jumlah[data-id="${b.dataset.id}"]`);
+    const { error } = await sb.from("stock_buah")
+      .update({ jumlah:+inp.value||0, updated_at:new Date().toISOString() }).eq("id",b.dataset.id);
+    toast(error ? "Gagal menyimpan: "+error.message : "Jumlah diperbarui", error?"gagal":"sukses");
+  }));
+  pasangHapus("stock_buah", muatStokBuah);
+}
+
+/* =====================================================================
+   14. MANAJEMEN — DATA KASIR
+   ===================================================================== */
+async function layarDataKasir(tabel){
+  const jual = tabel==="penjualan";
+  const { data } = await sb.from(tabel).select("*")
+    .order("tanggal",{ascending:false}).order("created_at",{ascending:false}).limit(300);
+  const total=(data||[]).reduce((a,r)=>a+Number((jual?r.total:r.nominal)||0),0);
+
+  $("#layar").innerHTML = judul(jual?"Data Penjualan":"Data Pengeluaran",
+      jual?"Seluruh transaksi yang dicatat kasir.":"Seluruh uang keluar dari laci kasir.") + `
+  <div class="papan">
+    <div class="kepala-papan"><h3>300 catatan terakhir</h3><span class="ket num">Total ${rp(total)}</span></div>
+    <div class="gulung">${ (data&&data.length) ? (jual ? `
+      <table><thead><tr><th>Tanggal</th><th>Buah</th><th class="kanan">Qty</th><th class="kanan">Harga</th><th class="kanan">Total</th><th>Bayar</th><th>Bukti</th><th></th></tr></thead><tbody>` +
+      data.map(r=>`<tr><td>${tglIndo(r.tanggal)}</td><td>${aman(r.jenis_buah)}</td>
+        <td class="kanan">${angka(r.qty)} ${aman(r.satuan)}</td><td class="kanan">${rp(r.harga)}</td>
+        <td class="kanan saldo-sel">${rp(r.total)}</td>
+        <td><span class="lencana ${r.pembayaran==="Cash"?"cash":"tf"}">${aman(r.pembayaran)}</span></td>
+        <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat</a>`:"—"}</td>
+        <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("")+`</tbody></table>` : `
+      <table><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="kanan">Nominal</th><th></th></tr></thead><tbody>` +
+      data.map(r=>`<tr><td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td>
+        <td class="kanan saldo-sel">${rp(r.nominal)}</td>
+        <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("")+`</tbody></table>`)
+      : kosong("Belum ada data","Kasir belum menyimpan catatan apa pun.") }
+    </div>
+  </div>`;
+  pasangHapus(tabel, ()=>layarDataKasir(tabel));
+}
+
+/* =====================================================================
+   15. MANAJEMEN — PENGGUNA
+   ===================================================================== */
+async function panggilAdmin(isi){
+  try{
+    const { data, error } = await sb.functions.invoke("kelola-user", { body:isi });
+    if(error){
+      let pesan = "";
+      try { const j = await error.context.json(); pesan = j?.error || ""; } catch(e){}
+      return { error: pesan || "Fungsi kelola-user belum terpasang di Supabase." };
+    }
+    if(data?.error) return { error:data.error };
+    return { data };
+  }catch(e){
+    return { error:"Fungsi kelola-user belum terpasang di Supabase." };
+  }
+}
+
+function kotakHak(terpilih){
+  let grupTerakhir=null;
+  return `<div class="hak">` + URUTAN.map(id => {
+    const m=SEMUA_MENU[id];
+    const kepala = m.grup!==grupTerakhir ? `<div class="hak-grup">${m.grup}</div>` : "";
+    grupTerakhir=m.grup;
+    return kepala + `<label><input type="checkbox" class="cek-hak" value="${id}"
+      ${terpilih.includes(id)?"checked":""}> ${m.ikon} ${m.label}</label>`;
+  }).join("") + `</div>`;
+}
+const hakTerpilih = () => Array.from(document.querySelectorAll(".cek-hak:checked")).map(c=>c.value);
+
+async function layarPengguna(){
+  if(profil.role!=="manajemen"){
+    $("#layar").innerHTML = judul("Pengguna","") + `<div class="papan">${kosong("Tidak punya akses","Menu ini hanya untuk akun manajemen.")}</div>`;
+    return;
+  }
+  const { data, error } = await sb.from("profiles").select("*").order("role").order("nama");
+
+  $("#layar").innerHTML = judul("Pengguna", "Tambah akun, atur jabatan, role, hak akses, dan kata sandi.") + `
+  <div class="papan">
+    <div class="kepala-papan">
+      <h3>Daftar akun</h3>
+      <button class="tombol kuning" id="btnTambahUser">Tambah akun</button>
+    </div>
+    <div class="gulung" id="isiTabel">${
+      error ? kosong("Tidak bisa memuat data", aman(error.message)) :
+      (!data||!data.length) ? kosong("Belum ada akun","Tambahkan akun pertama.") : `
+      <table><thead><tr><th>Nama</th><th>Email</th><th>Jabatan</th><th>Role</th><th>Hak akses</th><th></th></tr></thead><tbody>` +
+      data.map(u=>`<tr>
+        <td><strong>${aman(u.nama)||"—"}</strong>${u.id===sesi.user.id?' <span style="color:var(--teks-lembut);font-weight:400">(kamu)</span>':""}</td>
+        <td>${aman(u.email)||"—"}</td>
+        <td>${aman(u.jabatan)||"—"}</td>
+        <td><span class="lencana ${u.role==="manajemen"?"mjm":"ksr"}">${u.role==="manajemen"?"Manajemen":"Kasir"}</span></td>
+        <td>${(u.hak_akses&&u.hak_akses.length)? u.hak_akses.length+" menu dipilih" : "Bawaan role"}</td>
+        <td style="text-align:right">
+          <button class="aksi-mini ubah-user" data-id="${u.id}">Ubah</button>
+          <button class="aksi-mini sandi-user" data-id="${u.id}">Kata sandi</button>
+          ${u.id!==sesi.user.id?`<button class="hapus hapus-user" data-id="${u.id}">Hapus</button>`:""}
+        </td></tr>`).join("") + `</tbody></table>` }
+    </div>
+  </div>
+  <p class="catatan">Hak akses mengatur menu yang muncul di layar. Keamanan data tetap dijaga oleh role di server:
+  akun kasir tidak akan bisa membuka tabel pembukuan walaupun menunya dicentang.</p>`;
+
+  const cari = id => (data||[]).find(u=>u.id===id);
+
+  $("#btnTambahUser").addEventListener("click", () => {
+    bukaModal("Tambah akun", `
+      <div class="kisi">
+        <div><label>Nama</label><input id="uNama" class="isian" placeholder="Nama lengkap"></div>
+        <div><label>Jabatan</label><input id="uJabatan" class="isian" placeholder="Kasir toko"></div>
+        <div><label>Email</label><input id="uEmail" class="isian" type="email" inputmode="email" placeholder="nama@email.com"></div>
+        <div><label>Kata sandi</label><input id="uSandi" class="isian" type="text" placeholder="minimal 6 karakter"></div>
+        <div><label>Role</label><select id="uRole" class="isian"><option value="kasir">Kasir</option><option value="manajemen">Manajemen</option></select></div>
+      </div>
+      <label style="margin-top:6px">Hak akses menu</label>
+      ${kotakHak(BAWAAN.kasir)}
+      <p class="catatan">Kosongkan semua centang kalau ingin mengikuti menu bawaan role.</p>`,
+      async () => {
+        const nama=$("#uNama").value.trim(), email=$("#uEmail").value.trim();
+        const sandi=$("#uSandi").value, role=$("#uRole").value, jabatan=$("#uJabatan").value.trim();
+        if(!nama)  { toast("Nama belum diisi.","gagal"); return false; }
+        if(!email) { toast("Email belum diisi.","gagal"); return false; }
+        if(sandi.length<6){ toast("Kata sandi minimal 6 karakter.","gagal"); return false; }
+
+        const hak = hakTerpilih();
+        const hasil = await panggilAdmin({ aksi:"buat", email, password:sandi, nama, jabatan, role, hak_akses:hak });
+        if(hasil.error){ toast(hasil.error,"gagal"); return false; }
+        toast("Akun "+nama+" dibuat");
+        layarPengguna();
+      }, "Buat akun");
+    $("#uRole").addEventListener("change", e => {
+      const bawaan = BAWAAN[e.target.value];
+      document.querySelectorAll(".cek-hak").forEach(c => c.checked = bawaan.includes(c.value));
+    });
+  });
+
+  document.querySelectorAll(".ubah-user").forEach(b => b.addEventListener("click", () => {
+    const u=cari(b.dataset.id); if(!u) return;
+    bukaModal("Ubah "+(u.nama||u.email), `
+      <div class="kisi">
+        <div><label>Nama</label><input id="eNama" class="isian" value="${aman(u.nama)}"></div>
+        <div><label>Jabatan</label><input id="eJabatan" class="isian" value="${aman(u.jabatan)}" placeholder="Kasir toko"></div>
+        <div><label>Email</label><input id="eEmail" class="isian" type="email" value="${aman(u.email)}"></div>
+        <div><label>Role</label><select id="eRole" class="isian">
+          <option value="kasir"${u.role==="kasir"?" selected":""}>Kasir</option>
+          <option value="manajemen"${u.role==="manajemen"?" selected":""}>Manajemen</option></select></div>
+      </div>
+      <label style="margin-top:6px">Hak akses menu</label>
+      ${kotakHak(u.hak_akses||[])}
+      <p class="catatan">Tanpa centang sama sekali, akun ini memakai menu bawaan role-nya.</p>`,
+      async () => {
+        const role=$("#eRole").value, emailBaru=$("#eEmail").value.trim();
+        const { error } = await sb.from("profiles").update({
+          nama:$("#eNama").value.trim(), jabatan:$("#eJabatan").value.trim(),
+          role, hak_akses:hakTerpilih()
+        }).eq("id", u.id);
+        if(error){ toast("Gagal menyimpan: "+error.message,"gagal"); return false; }
+
+        if(emailBaru && emailBaru.toLowerCase()!==String(u.email||"").toLowerCase()){
+          const hasil = await panggilAdmin({ aksi:"email", id:u.id, email:emailBaru });
+          if(hasil.error) toast("Profil tersimpan, tapi email login gagal diubah: "+hasil.error,"gagal");
+          else toast("Perubahan tersimpan");
+        } else toast("Perubahan tersimpan");
+
+        if(u.id===sesi.user.id){
+          const { data:baru } = await sb.from("profiles").select("*").eq("id",sesi.user.id).single();
+          if(baru){ profil=baru; bangunMenu(); return; }
+        }
+        layarPengguna();
+      });
+  }));
+
+  document.querySelectorAll(".sandi-user").forEach(b => b.addEventListener("click", () => {
+    const u=cari(b.dataset.id); if(!u) return;
+    const sendiri = u.id===sesi.user.id;
+    bukaModal("Kata sandi — "+(u.nama||u.email), `
+      <div class="grup"><label>Kata sandi baru</label>
+        <input id="pBaru" class="isian" type="text" placeholder="minimal 6 karakter"></div>
+      <div class="grup"><label>Ulangi kata sandi</label>
+        <input id="pUlang" class="isian" type="text" placeholder="ketik ulang"></div>
+      <p class="catatan">${sendiri
+        ? "Kamu akan tetap masuk setelah kata sandi diganti."
+        : "Kata sandi lama langsung tidak berlaku. Beritahu yang bersangkutan setelah diganti."}</p>`,
+      async () => {
+        const p1=$("#pBaru").value, p2=$("#pUlang").value;
+        if(p1.length<6){ toast("Kata sandi minimal 6 karakter.","gagal"); return false; }
+        if(p1!==p2){ toast("Dua isian kata sandi belum sama.","gagal"); return false; }
+
+        if(sendiri){
+          const { error } = await sb.auth.updateUser({ password:p1 });
+          if(error){ toast("Gagal mengubah: "+error.message,"gagal"); return false; }
+          toast("Kata sandi kamu diperbarui"); return;
+        }
+        const hasil = await panggilAdmin({ aksi:"password", id:u.id, password:p1 });
+        if(hasil.error){
+          if(confirm(hasil.error+"\n\nKirim link penggantian kata sandi ke "+u.email+" sebagai gantinya?")){
+            const { error:e2 } = await sb.auth.resetPasswordForEmail(u.email, { redirectTo: location.href });
+            toast(e2 ? "Gagal mengirim: "+e2.message : "Link dikirim ke "+u.email, e2?"gagal":"sukses");
+            return;
+          }
+          return false;
+        }
+        toast("Kata sandi diperbarui");
+      }, "Ubah kata sandi");
+  }));
+
+  document.querySelectorAll(".hapus-user").forEach(b => b.addEventListener("click", async () => {
+    const u=cari(b.dataset.id); if(!u) return;
+    if(!confirm("Hapus akun "+(u.nama||u.email)+"? Transaksi yang sudah dicatat tetap tersimpan.")) return;
+    const hasil = await panggilAdmin({ aksi:"hapus", id:u.id });
+    if(hasil.error) return toast(hasil.error,"gagal");
+    toast("Akun dihapus"); layarPengguna();
+  }));
+}
+
+/* =====================================================================
+   15b. NOTIFIKASI — kabar dari kasir untuk manajemen
+   ===================================================================== */
+let daftarNotif = [], kanalNotif = null;
+const KUNCI_NOTIF = "buahmurah:tanya-notif";
+
+function jumlahBelumDibaca(){ return daftarNotif.filter(n => !n.dibaca).length; }
+
+function gambarLonceng(){
+  const boleh = profil && profil.role === "manajemen";
+  const n = jumlahBelumDibaca();
+  document.querySelectorAll(".lonceng").forEach(b => {
+    b.style.display = boleh ? "block" : "none";
+    const t = b.querySelector(".titik");
+    if(t){ t.textContent = n > 9 ? "9+" : String(n); t.className = "titik" + (n ? " ada" : ""); }
+  });
+}
+
+async function muatNotifikasi(){
+  const { data } = await sb.from("notifikasi").select("*")
+    .order("created_at",{ascending:false}).limit(50);
+  daftarNotif = data || [];
+  gambarLonceng();
+}
+
+function mulaiNotifikasi(){
+  gambarLonceng();
+  if(!profil || profil.role !== "manajemen") return;
+  muatNotifikasi();
+  hentikanNotifikasi();
+  kanalNotif = sb.channel("notifikasi-masuk")
+    .on("postgres_changes", { event:"INSERT", schema:"public", table:"notifikasi" }, muatan => {
+      const n = muatan.new;
+      if(n.untuk_role !== profil.role) return;
+      daftarNotif.unshift(n);
+      gambarLonceng();
+      tampilkanNotifikasi(n);
+    })
+    .subscribe();
+  if(("Notification" in window) && Notification.permission === "default"
+     && penyimpanan.getItem(KUNCI_NOTIF) !== "nanti"){
+    setTimeout(tawarkanIzinNotifikasi, 2500);
+  }
+}
+
+function hentikanNotifikasi(){
+  if(kanalNotif){ sb.removeChannel(kanalNotif); kanalNotif = null; }
+  daftarNotif = [];
+  gambarLonceng();
+}
+
+function isiNotif(n){
+  return n.pesan + (Number(n.nominal) ? " — " + rp(n.nominal) : "");
+}
+
+async function tampilkanNotifikasi(n){
+  const teks = isiNotif(n);
+  if(("Notification" in window) && Notification.permission === "granted"){
+    const tujuan = n.jenis === "pengeluaran" ? "pengeluaran_m" : "penjualan_m";
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      reg.showNotification(n.judul, {
+        body: teks, icon:"ikon/ikon-192.png", badge:"ikon/ikon-192.png",
+        tag:"notif-"+n.id, data:{ hal:tujuan }, vibrate:[90,50,90]
+      });
+    }catch(e){
+      try{ new Notification(n.judul, { body:teks, icon:"ikon/ikon-192.png" }); }catch(e2){}
+    }
+  }
+  toast(n.judul + " — " + teks);
+}
+
+async function mintaIzinNotifikasi(){
+  if(!("Notification" in window)) return toast("Browser ini tidak mendukung notifikasi.","gagal");
+  const izin = await Notification.requestPermission();
+  if(izin === "granted"){
+    toast("Notifikasi aktif");
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      reg.showNotification("Notifikasi aktif", {
+        body:"Catatan baru dari kasir akan muncul di sini.",
+        icon:"ikon/ikon-192.png", tag:"uji" });
+    }catch(e){}
+  } else {
+    toast("Notifikasi belum diizinkan.","gagal");
+  }
+  return izin;
+}
+
+function tawarkanIzinNotifikasi(){
+  if($("#tirai").classList.contains("tampil")) return;
+  if($("#dialogPasang").classList.contains("tampil")) return;
+  bukaModal("Aktifkan notifikasi?", `
+    <p style="font-size:15px">Setiap kali kasir menyimpan penjualan atau pengeluaran, kabar itu
+    langsung muncul di HP kamu — lengkap dengan nominalnya.</p>
+    <p class="catatan">Bisa dimatikan kapan saja lewat pengaturan browser.</p>`,
+    async () => { await mintaIzinNotifikasi(); },
+    "Aktifkan");
+  $("#modalBatal").textContent = "Nanti saja";
+  penyimpanan.setItem(KUNCI_NOTIF, "nanti");   // cukup ditawarkan sekali
+}
+
+function bukaPanelNotifikasi(){
+  const izin = ("Notification" in window) ? Notification.permission : "tidak-ada";
+  const kepala = izin === "granted" ? "" : `
+    <div class="pesan tampil info" style="margin-bottom:16px">
+      ${izin === "denied"
+        ? "Notifikasi diblokir di browser ini. Buka pengaturan situs lalu izinkan notifikasi."
+        : "Notifikasi HP belum aktif."}
+      ${izin === "default" ? `<div><button class="tombol kuning" id="btnIzinNotif"
+         style="margin-top:10px;padding:8px 14px;font-size:13px">Aktifkan notifikasi</button></div>` : ""}
+    </div>`;
+
+  const isi = kepala + (daftarNotif.length ? `
+    <div class="daftar-notif">` + daftarNotif.map(n => `
+      <div class="notif ${n.dibaca ? "" : "baru"}">
+        <div class="nj">${aman(n.judul)}</div>
+        <div class="np">${aman(isiNotif(n))}</div>
+        <div class="nw">${new Date(n.created_at).toLocaleString("id-ID",
+          {day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+      </div>`).join("") + `</div>
+    <button class="tombol garis" id="btnTandaiNotif" style="margin-top:8px;width:100%">Tandai semua sudah dibaca</button>`
+    : kosong("Belum ada notifikasi","Catatan baru dari kasir akan muncul di sini."));
+
+  bukaModal("Notifikasi", isi, null);
+
+  const bIzin = $("#btnIzinNotif");
+  if(bIzin) bIzin.addEventListener("click", async () => {
+    const izinBaru = await mintaIzinNotifikasi();
+    if(izinBaru === "granted") bukaPanelNotifikasi();
+  });
+
+  const bTandai = $("#btnTandaiNotif");
+  if(bTandai) bTandai.addEventListener("click", async () => {
+    const { error } = await sb.from("notifikasi").update({ dibaca:true }).eq("dibaca", false);
+    if(error) return toast("Gagal menandai: "+error.message,"gagal");
+    daftarNotif = daftarNotif.map(n => ({ ...n, dibaca:true }));
+    gambarLonceng(); bukaPanelNotifikasi();
+  });
+}
+
+document.querySelectorAll(".lonceng").forEach(b => b.addEventListener("click", bukaPanelNotifikasi));
+
+/* =====================================================================
+   16. AKUN SAYA
+   ===================================================================== */
+function layarProfil(){
+  $("#layar").innerHTML = judul("Akun saya", "Data akun dan penggantian kata sandi.") + `
+  <div class="papan"><div class="papan-isi">
+    <div class="kisi" style="margin-bottom:0">
+      <div><label>Nama</label><div>${aman(profil.nama)||"—"}</div></div>
+      <div><label>Email</label><div>${aman(profil.email||sesi.user.email)}</div></div>
+      <div><label>Jabatan</label><div>${aman(profil.jabatan)||"—"}</div></div>
+      <div><label>Role</label><div><span class="lencana ${profil.role==="manajemen"?"mjm":"ksr"}">${profil.role==="manajemen"?"Manajemen":"Kasir"}</span></div></div>
+    </div>
+  </div></div>
+
+  <div class="papan" style="margin-top:22px"><div class="papan-isi">
+    <h3 style="font-size:16px;margin-bottom:16px">Ganti kata sandi</h3>
+    <div class="baris2">
+      <div class="grup"><label>Kata sandi baru</label><input id="sBaru" class="isian" type="password" autocomplete="new-password"></div>
+      <div class="grup"><label>Ulangi kata sandi</label><input id="sUlang" class="isian" type="password" autocomplete="new-password"></div>
+    </div>
+    <button class="tombol biru" id="btnGantiSandi">Ganti kata sandi</button>
+  </div></div>
+
+  <div class="papan" style="margin-top:22px"><div class="papan-isi">
+    <h3 style="font-size:16px;margin-bottom:8px">Notifikasi</h3>
+    <p class="catatan" style="margin-top:0" id="ketNotif">—</p>
+    <button class="tombol kuning" id="btnIzinProfil" style="margin-top:14px">Aktifkan notifikasi</button>
+  </div></div>
+
+  <div class="papan" style="margin-top:22px"><div class="papan-isi">
+    <h3 style="font-size:16px;margin-bottom:8px">Pasang di layar utama</h3>
+    <p class="catatan" style="margin-top:0">Di Android: buka menu titik tiga di browser lalu pilih “Tambahkan ke layar utama”.
+    Di iPhone: tombol Bagikan lalu “Tambahkan ke Layar Utama”. Setelah terpasang, aplikasi terbuka layar penuh tanpa alamat browser.</p>
+    <button class="tombol kuning pasang" id="btnPasangProfil" style="margin-top:14px">Pasang aplikasi sekarang</button>
+  </div></div>`;
+
+  $("#btnPasangProfil").classList.add("tampil");
+  $("#btnPasangProfil").addEventListener("click", jalankanPasang);
+
+  const izin = ("Notification" in window) ? Notification.permission : "tidak-ada";
+  const ket = {
+    granted:"Notifikasi aktif di perangkat ini.",
+    denied:"Notifikasi diblokir. Buka pengaturan situs di browser lalu izinkan notifikasi.",
+    default: profil.role === "manajemen"
+      ? "Aktifkan supaya setiap catatan penjualan dan pengeluaran dari kasir langsung masuk ke HP kamu."
+      : "Aktifkan untuk menerima pemberitahuan dari aplikasi.",
+    "tidak-ada":"Browser ini tidak mendukung notifikasi."
+  }[izin];
+  $("#ketNotif").textContent = ket;
+  const bIzin = $("#btnIzinProfil");
+  if(izin !== "default") bIzin.style.display = "none";
+  bIzin.addEventListener("click", async () => { await mintaIzinNotifikasi(); layarProfil(); });
+
+  $("#btnGantiSandi").addEventListener("click", async () => {
+    const p1=$("#sBaru").value, p2=$("#sUlang").value;
+    if(p1.length<6) return toast("Kata sandi minimal 6 karakter.","gagal");
+    if(p1!==p2) return toast("Dua isian kata sandi belum sama.","gagal");
+    const b=$("#btnGantiSandi"); b.disabled=true; b.textContent="Menyimpan…";
+    const { error } = await sb.auth.updateUser({ password:p1 });
+    b.disabled=false; b.textContent="Ganti kata sandi";
+    if(error) return toast("Gagal mengubah: "+error.message,"gagal");
+    $("#sBaru").value=""; $("#sUlang").value="";
+    toast("Kata sandi diperbarui");
+  });
+}
+
+/* =====================================================================
+   17. PWA — pemasangan & service worker
+   ===================================================================== */
+let promptPasang = null;
+const KUNCI_PASANG = "buahmurah:tanya-pasang";
+const JEDA_TANYA = 3*24*60*60*1000;   // tanya lagi 3 hari kemudian
+
+const sudahTerpasang = () =>
+  (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+  window.navigator.standalone === true;
+
+function bolehTanyaPasang(){
+  if(sudahTerpasang()) return false;
+  const terakhir = Number(penyimpanan.getItem(KUNCI_PASANG) || 0);
+  return Date.now() - terakhir > JEDA_TANYA;
+}
+
+function tampilkanDialogPasang(caraManual){
+  if(!bolehTanyaPasang()) return;
+  if(caraManual){
+    const iOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    $("#pasangKet").textContent = iOS
+      ? "Tekan tombol Bagikan di bawah layar, lalu pilih Tambahkan ke Layar Utama."
+      : "Buka menu titik tiga di browser, lalu pilih Tambahkan ke layar utama atau Instal aplikasi.";
+    $("#btnPasangSekarang").textContent = "Mengerti";
+  }
+  $("#dialogPasang").classList.add("tampil");
+}
+
+function tutupDialogPasang(ingat){
+  if(ingat) penyimpanan.setItem(KUNCI_PASANG, String(Date.now()));
+  $("#dialogPasang").classList.remove("tampil");
+}
+
+$("#btnPasangNanti").addEventListener("click", () => tutupDialogPasang(true));
+$("#btnPasangSekarang").addEventListener("click", async () => {
+  if(!promptPasang){ tutupDialogPasang(true); return; }
+  tutupDialogPasang(false);
+  await jalankanPasang();
+});
+
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  promptPasang = e;
+  document.querySelectorAll(".pasang").forEach(b => b.classList.add("tampil"));
+  tampilkanDialogPasang(false);
+});
+
+// Kalau browser tidak menawarkan pemasangan otomatis (iPhone, misalnya),
+// tampilkan panduan manual setelah halaman siap.
+setTimeout(() => { if(!promptPasang) tampilkanDialogPasang(true); }, 3500);
+
+async function jalankanPasang(){
+  if(!promptPasang){
+    tampilkanDialogPasang(true);
+    return;
+  }
+  promptPasang.prompt();
+  await promptPasang.userChoice;
+  promptPasang = null;
+  document.querySelectorAll(".pasang").forEach(b => b.classList.remove("tampil"));
+}
+$("#btnPasang").addEventListener("click", jalankanPasang);
+$("#btnPasangHp").addEventListener("click", jalankanPasang);
+window.addEventListener("appinstalled", () => {
+  promptPasang = null;
+  tutupDialogPasang(true);
+  document.querySelectorAll(".pasang").forEach(b => b.classList.remove("tampil"));
+  toast("Aplikasi terpasang di layar utama");
+});
+
+// Ketukan pada notifikasi membuka menu yang sesuai
+navigator.serviceWorker?.addEventListener("message", e => {
+  if(e.data?.tipe === "buka-halaman" && profil) buka(e.data.hal);
+});
+
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+/* =====================================================================
+   18. JALAN
+   ===================================================================== */
+(async () => {
+  if(!terpasang) return;
+  const { data } = await sb.auth.getSession();
+  if(data.session) await mulaiSesi(data.session);
+})();
+</script>
+</body>
+</html>
