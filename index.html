@@ -144,6 +144,17 @@ main{padding:0 34px 90px;min-width:0}
 .tombol.kecil{padding:9px 13px;font-size:13.5px;display:inline-flex;align-items:center;gap:7px}
 .nama-bukti{font-size:13px;color:var(--teks-lembut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
+/* ============ FILTER TANGGAL ============ */
+.filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cip{
+  padding:8px 15px;border-radius:100px;border:1.5px solid var(--garis);background:#fff;
+  font-weight:600;font-size:13.5px;transition:.15s;white-space:nowrap}
+.cip:hover{border-color:var(--biru);color:var(--biru)}
+.cip.aktif{background:var(--biru-tua);border-color:var(--biru-tua);color:#fff}
+.rentang{display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%;margin-top:6px}
+.rentang input{padding:9px 12px;border:1.5px solid var(--garis);border-radius:var(--r-kecil);background:#fff}
+.rentang .antara{color:var(--teks-lembut);font-size:13.5px}
+
 /* ============ MENU LAINNYA ============ */
 .kisi-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .kisi-menu button{
@@ -544,6 +555,155 @@ async function unggahBukti(pre, folder){
   return { url: sb.storage.from("bukti").getPublicUrl(path).data.publicUrl };
 }
 
+/* ---- Filter tanggal yang dipakai ulang di beberapa layar ---- */
+function geserHari(selisih){
+  const d = new Date();
+  d.setDate(d.getDate() + selisih);
+  return d.toLocaleDateString("sv-SE");
+}
+function hitungRentang(mode){
+  const h = hariIni();
+  if(mode === "kemarin") return [geserHari(-1), geserHari(-1)];
+  if(mode === "7hari")   return [geserHari(-6), h];
+  if(mode === "bulan")   return [h.slice(0,7) + "-01", h];
+  return [h, h];                       // hari ini
+}
+function labelRentang(st){
+  if(st.mode === "hari")    return "Hari ini";
+  if(st.mode === "kemarin") return "Kemarin";
+  if(st.mode === "7hari")   return "7 hari terakhir";
+  if(st.mode === "bulan")   return "Bulan ini";
+  return tglIndo(st.dari) + " – " + tglIndo(st.sampai);
+}
+function buatFilter(){
+  const [a,z] = hitungRentang("hari");
+  return { mode:"hari", dari:a, sampai:z };
+}
+function kotakFilter(pre){
+  return `<div class="filter" id="${pre}Filter">
+    <button class="cip aktif" data-mode="hari">Hari ini</button>
+    <button class="cip" data-mode="kemarin">Kemarin</button>
+    <button class="cip" data-mode="7hari">7 hari</button>
+    <button class="cip" data-mode="bulan">Bulan ini</button>
+    <button class="cip" data-mode="rentang">Rentang tanggal</button>
+    <div class="rentang" id="${pre}Rentang" style="display:none">
+      <input type="date" id="${pre}Dari" value="${hariIni()}">
+      <span class="antara">sampai</span>
+      <input type="date" id="${pre}Sampai" value="${hariIni()}">
+      <button class="tombol biru kecil" id="${pre}Terapkan">Terapkan</button>
+    </div>
+  </div>`;
+}
+function pasangFilter(pre, st, muatUlang){
+  document.querySelectorAll(`#${pre}Filter [data-mode]`).forEach(b =>
+    b.addEventListener("click", () => {
+      document.querySelectorAll(`#${pre}Filter [data-mode]`)
+        .forEach(x => x.classList.toggle("aktif", x === b));
+      st.mode = b.dataset.mode;
+      $("#"+pre+"Rentang").style.display = st.mode === "rentang" ? "flex" : "none";
+      if(st.mode !== "rentang"){
+        [st.dari, st.sampai] = hitungRentang(st.mode);
+        muatUlang();
+      }
+    }));
+  $("#"+pre+"Terapkan").addEventListener("click", () => {
+    st.dari   = $("#"+pre+"Dari").value   || hariIni();
+    st.sampai = $("#"+pre+"Sampai").value || hariIni();
+    if(st.dari > st.sampai){ const t = st.dari; st.dari = st.sampai; st.sampai = t; }
+    muatUlang();
+  });
+}
+
+/* ---- Form ubah baris yang dipakai ulang di semua tabel manajemen ---- */
+function formBidang(bidang, baris){
+  return `<div class="kisi">` + bidang.map(f => {
+    const v = baris[f.key] ?? "";
+    const rentang = f.lebar ? ' style="grid-column:span 2"' : "";
+    if(f.tipe === "pilih")
+      return `<div${rentang}><label>${f.label}</label><select class="isian" data-k="${f.key}">` +
+        f.opsi.map(o => `<option${String(o)===String(v)?" selected":""}>${o}</option>`).join("") +
+        `</select></div>`;
+    if(f.tipe === "uang")
+      return `<div${rentang}><label>${f.label}</label>
+        <input class="isian num uang" data-k="${f.key}" type="text" value="${Number(v)||0}"></div>`;
+    if(f.tipe === "angka")
+      return `<div${rentang}><label>${f.label}</label>
+        <input class="isian num" data-k="${f.key}" type="number" min="0" step="${f.langkah||1}" value="${Number(v)||0}"></div>`;
+    const t = f.tipe === "tanggal" ? "date" : f.tipe === "bulan" ? "month" : "text";
+    return `<div${rentang}><label>${f.label}</label>
+      <input class="isian" data-k="${f.key}" type="${t}" value="${aman(v)}"></div>`;
+  }).join("") + `</div>`;
+}
+function nilaiBidang(bidang){
+  const isi = {};
+  bidang.forEach(f => {
+    const el = document.querySelector(`#modalIsi [data-k="${f.key}"]`);
+    if(!el) return;
+    isi[f.key] = f.tipe === "uang"  ? uang(el)
+               : f.tipe === "angka" ? (Number(el.value) || 0)
+               : el.value;
+  });
+  return isi;
+}
+function ubahBaris(tabel, baris, bidang, muatUlang, judulTeks){
+  bukaModal(judulTeks || "Ubah baris", formBidang(bidang, baris), async () => {
+    const isi = nilaiBidang(bidang);
+    if(isi.keterangan !== undefined && !String(isi.keterangan).trim()){
+      toast("Keterangan belum diisi.","gagal"); return false;
+    }
+    const { error } = await sb.from(tabel).update(isi).eq("id", baris.id);
+    if(error){ toast("Gagal menyimpan: "+error.message,"gagal"); return false; }
+    toast("Perubahan tersimpan");
+    muatUlang();
+  }, "Simpan perubahan");
+}
+function pasangUbah(tabel, data, bidang, muatUlang, judulTeks){
+  document.querySelectorAll(".ubah-baris").forEach(b => b.addEventListener("click", () => {
+    const baris = (data||[]).find(r => String(r.id) === b.dataset.id);
+    if(baris) ubahBaris(tabel, baris, bidang, muatUlang, judulTeks);
+  }));
+}
+
+/* Daftar kolom yang boleh diubah, per tabel */
+const SATUAN = ["Kg","Pcs","Peti","Ikat","Dus"];
+const BIDANG = {
+  penjualan:   [{key:"tanggal",label:"Tanggal",tipe:"tanggal"},
+                {key:"jenis_buah",label:"Jenis buah",tipe:"teks",lebar:true},
+                {key:"qty",label:"Jumlah",tipe:"angka",langkah:0.5},
+                {key:"satuan",label:"Satuan",tipe:"pilih",opsi:SATUAN},
+                {key:"harga",label:"Harga per satuan",tipe:"uang"},
+                {key:"pembayaran",label:"Pembayaran",tipe:"pilih",opsi:["Cash","Transfer"]}],
+  pengeluaran: [{key:"tanggal",label:"Tanggal",tipe:"tanggal"},
+                {key:"nominal",label:"Nominal",tipe:"uang"},
+                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true}],
+  cashflow:    [{key:"nomor",label:"Nomor",tipe:"angka"},
+                {key:"tanggal",label:"Tanggal",tipe:"tanggal"},
+                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true},
+                {key:"debit",label:"Debit (masuk)",tipe:"uang"},
+                {key:"kredit",label:"Kredit (keluar)",tipe:"uang"}],
+  kulakan:     [{key:"nomor",label:"Nomor",tipe:"angka"},
+                {key:"tanggal",label:"Tanggal",tipe:"tanggal"},
+                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true},
+                {key:"jumlah",label:"Jumlah",tipe:"angka",langkah:0.5},
+                {key:"satuan",label:"Satuan",tipe:"pilih",opsi:SATUAN},
+                {key:"harga",label:"Harga per satuan",tipe:"uang"}],
+  gaji:        [{key:"nomor",label:"Nomor",tipe:"angka"},
+                {key:"nama",label:"Nama karyawan",tipe:"teks"},
+                {key:"bulan",label:"Bulan",tipe:"bulan"},
+                {key:"absensi",label:"Absensi (hari masuk)",tipe:"angka"},
+                {key:"total_hari",label:"Total hari kerja",tipe:"angka"},
+                {key:"kasbon",label:"Kasbon",tipe:"uang"},
+                {key:"total",label:"Total diterima",tipe:"uang"}],
+  stock_opname:[{key:"nomor",label:"Nomor",tipe:"angka"},
+                {key:"tanggal",label:"Tanggal",tipe:"tanggal"},
+                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true},
+                {key:"kondisi",label:"Kondisi",tipe:"pilih",opsi:["Baik","Rusak"]}],
+  stock_buah:  [{key:"jenis_buah",label:"Jenis buah",tipe:"teks",lebar:true},
+                {key:"jumlah",label:"Jumlah",tipe:"angka",langkah:0.5},
+                {key:"satuan",label:"Satuan",tipe:"pilih",opsi:SATUAN},
+                {key:"harga",label:"Harga jual per satuan",tipe:"uang"}]
+};
+
 let jamToast;
 function toast(teks, jenis="sukses"){
   const t=$("#toast"); t.textContent=teks; t.className="tampil "+jenis;
@@ -823,11 +983,23 @@ const kosong = (t,s) => `<div class="kosong"><strong>${t}</strong>${s}</div>`;
    ===================================================================== */
 let bayarTerpilih = null;
 
+function pilihanBuahHTML(buah){
+  return (buah||[]).map(b =>
+    `<option value="${aman(b.jenis_buah)}" data-harga="${b.harga||0}" data-satuan="${aman(b.satuan)}"
+      data-sisa="${b.jumlah||0}">${aman(b.jenis_buah)} — sisa ${angka(b.jumlah)} ${aman(b.satuan)}</option>`).join("");
+}
+
+async function segarkanDaftarBuah(){
+  const sel = $("#fBuah"); if(!sel) return;
+  const { data } = await sb.from("stock_buah").select("*").eq("aktif",true).order("jenis_buah");
+  sel.innerHTML =
+    `<option value="">${(data||[]).length ? "— pilih buah —" : "— belum ada buah di daftar stok —"}</option>` +
+    pilihanBuahHTML(data);
+}
+
 async function layarPenjualan(){
   const { data:buah } = await sb.from("stock_buah").select("*").eq("aktif",true).order("jenis_buah");
-  const pilihan = (buah||[]).map(b =>
-    `<option value="${aman(b.jenis_buah)}" data-harga="${b.harga||0}" data-satuan="${aman(b.satuan)}"
-      >${aman(b.jenis_buah)} — sisa ${angka(b.jumlah)} ${aman(b.satuan)}</option>`).join("");
+  const pilihan = pilihanBuahHTML(buah);
   const adaBuah = (buah||[]).length > 0;
   bayarTerpilih = null;
 
@@ -913,6 +1085,10 @@ async function layarPenjualan(){
       $("#pilihBayar").classList.add("perlu");
       return toast("Pilih dulu: Cash atau Transfer.","gagal");
     }
+    const opsi = fBuah.selectedOptions[0];
+    const sisa = opsi ? Number(opsi.dataset.sisa) : NaN;
+    if(!isNaN(sisa) && (+fQty.value) > sisa)
+      toast("Catatan: stok tercatat tinggal " + angka(sisa) + ". Penjualan tetap disimpan.");
     const b=$("#btnJual"); b.disabled=true; b.textContent="Menyimpan…";
 
     let bukti=null;
@@ -932,6 +1108,7 @@ async function layarPenjualan(){
 
     toast("Penjualan tersimpan");
     fBuah.value=""; fQty.value=1; fHarga.value="0"; $("#fSatuan").textContent="Kg"; resetBukti("jual");
+    segarkanDaftarBuah();
     bayarTerpilih=null;
     document.querySelectorAll("[data-bayar]").forEach(x=>x.classList.remove("aktif"));
     $("#kotakTransfer").classList.remove("tampil");
@@ -1016,33 +1193,74 @@ async function muatTabelKeluar(){
 /* =====================================================================
    8. KASIR — RIWAYAT
    ===================================================================== */
-async function layarRiwayat(){
-  const { data:jual } = await sb.from("penjualan").select("*").order("created_at",{ascending:false}).limit(100);
-  const { data:keluar } = await sb.from("pengeluaran").select("*").order("created_at",{ascending:false}).limit(100);
-  const totJual=(jual||[]).reduce((a,b)=>a+Number(b.total||0),0);
+let saringRiwayat = null;
 
-  $("#layar").innerHTML = judul("Riwayat", "100 catatan terakhir yang kamu masukkan.") + `
+function layarRiwayat(){
+  saringRiwayat = buatFilter();
+
+  $("#layar").innerHTML = judul("Riwayat", "Catatan yang kamu masukkan, disaring menurut tanggal.") + `
+  <div class="papan" style="margin-bottom:22px"><div class="papan-isi">${kotakFilter("rw")}</div></div>
   <div class="papan">
-    <div class="kepala-papan"><h3>Penjualan</h3><span class="ket num">Total ${rp(totJual)}</span></div>
-    <div class="gulung">${ (jual&&jual.length) ? `
-      <table><thead><tr><th>Tanggal</th><th>Buah</th><th class="kanan">Qty</th><th class="kanan">Harga</th><th class="kanan">Total</th><th>Bayar</th><th>Bukti</th></tr></thead><tbody>` +
-      jual.map(r=>`<tr>
-        <td>${tglIndo(r.tanggal)}</td><td>${aman(r.jenis_buah)}</td>
-        <td class="kanan">${angka(r.qty)} ${aman(r.satuan)}</td>
-        <td class="kanan">${rp(r.harga)}</td><td class="kanan">${rp(r.total)}</td>
-        <td><span class="lencana ${r.pembayaran==="Cash"?"cash":"tf"}">${aman(r.pembayaran)}</span></td>
-        <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat</a>`:"—"}</td>
-      </tr>`).join("")+`</tbody></table>` : kosong("Belum ada penjualan","Mulai dari menu Penjualan.") }
+    <div class="kepala-papan">
+      <h3>Penjualan</h3>
+      <span class="ket num" id="rwJudulJual">—</span>
     </div>
+    <div class="gulung" id="rwJual"><div class="memuat">Memuat…</div></div>
   </div>
   <div class="papan" style="margin-top:22px">
-    <div class="kepala-papan"><h3>Pengeluaran</h3></div>
-    <div class="gulung">${ (keluar&&keluar.length) ? `
-      <table><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="kanan">Nominal</th></tr></thead><tbody>` +
-      keluar.map(r=>`<tr><td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td><td class="kanan">${rp(r.nominal)}</td></tr>`).join("")+
-      `</tbody></table>` : kosong("Belum ada pengeluaran","Catatan masih kosong.") }
+    <div class="kepala-papan">
+      <h3>Pengeluaran</h3>
+      <span class="ket num" id="rwJudulKeluar">—</span>
     </div>
+    <div class="gulung" id="rwKeluar"><div class="memuat">Memuat…</div></div>
   </div>`;
+
+  pasangFilter("rw", saringRiwayat, muatRiwayat);
+  muatRiwayat();
+}
+
+async function muatRiwayat(){
+  const st = saringRiwayat;
+  const wJual = $("#rwJual"), wKeluar = $("#rwKeluar");
+  if(!wJual) return;
+  wJual.innerHTML = wKeluar.innerHTML = `<div class="memuat">Memuat…</div>`;
+
+  const [j,k] = await Promise.all([
+    sb.from("penjualan").select("*")
+      .gte("tanggal", st.dari).lte("tanggal", st.sampai)
+      .order("tanggal",{ascending:false}).order("created_at",{ascending:false}).limit(300),
+    sb.from("pengeluaran").select("*")
+      .gte("tanggal", st.dari).lte("tanggal", st.sampai)
+      .order("tanggal",{ascending:false}).order("created_at",{ascending:false}).limit(300)
+  ]);
+  const jual = j.data || [], keluar = k.data || [];
+  const totJual = jual.reduce((a,b)=>a+Number(b.total||0),0);
+  const totKeluar = keluar.reduce((a,b)=>a+Number(b.nominal||0),0);
+
+  $("#rwJudulJual").textContent   = labelRentang(st) + " · " + jual.length + " transaksi · " + rp(totJual);
+  $("#rwJudulKeluar").textContent = labelRentang(st) + " · " + rp(totKeluar);
+
+  wJual.innerHTML = jual.length ? `
+    <table><thead><tr><th>Tanggal</th><th>Jam</th><th>Buah</th><th class="kanan">Qty</th>
+      <th class="kanan">Harga</th><th class="kanan">Total</th><th>Bayar</th><th>Bukti</th></tr></thead><tbody>` +
+    jual.map(r=>`<tr>
+      <td>${tglIndo(r.tanggal)}</td>
+      <td>${new Date(r.created_at).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}</td>
+      <td>${aman(r.jenis_buah)}</td>
+      <td class="kanan">${angka(r.qty)} ${aman(r.satuan)}</td>
+      <td class="kanan">${rp(r.harga)}</td><td class="kanan saldo-sel">${rp(r.total)}</td>
+      <td><span class="lencana ${r.pembayaran==="Cash"?"cash":"tf"}">${aman(r.pembayaran)}</span></td>
+      <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat</a>`:"—"}</td>
+    </tr>`).join("") + `</tbody></table>`
+    : kosong("Tidak ada penjualan", "Tidak ada catatan pada " + labelRentang(st).toLowerCase() + ".");
+
+  wKeluar.innerHTML = keluar.length ? `
+    <table><thead><tr><th>Tanggal</th><th>Jam</th><th>Keterangan</th><th class="kanan">Nominal</th></tr></thead><tbody>` +
+    keluar.map(r=>`<tr>
+      <td>${tglIndo(r.tanggal)}</td>
+      <td>${new Date(r.created_at).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}</td>
+      <td>${aman(r.keterangan)}</td><td class="kanan">${rp(r.nominal)}</td></tr>`).join("") + `</tbody></table>`
+    : kosong("Tidak ada pengeluaran", "Tidak ada catatan pada " + labelRentang(st).toLowerCase() + ".");
 }
 
 /* =====================================================================
@@ -1248,7 +1466,7 @@ async function muatKulakan(){
       <td class="kanan">${rp(r.harga)}</td>
       <td class="kanan saldo-sel">${rp(sub)}</td>
       <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat bukti</a>`:"—"}</td>
-      <td><button class="hapus" data-id="${r.id}">Hapus</button></td>
+      <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td>
     </tr>`;
   }).join("");
 
@@ -1258,6 +1476,7 @@ async function muatKulakan(){
     </tr></thead><tbody>${baris}</tbody>
     <tfoot><tr><th colspan="6" class="kanan">Total belanja kulakan</th>
       <th class="kanan num">${rp(total)}</th><th colspan="2"></th></tr></tfoot></table>`;
+  pasangUbah("kulakan", data, BIDANG.kulakan, muatKulakan, "Ubah baris kulakan");
   pasangHapus("kulakan", muatKulakan);
 }
 
@@ -1277,7 +1496,7 @@ async function muatBuku(tabel){
       <td class="kanan">${Number(r.kredit)?rp(r.kredit):"—"}</td>
       <td class="kanan saldo-sel">${rp(saldo)}</td>
       <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat bukti</a>`:"—"}</td>
-      <td><button class="hapus" data-id="${r.id}">Hapus</button></td>
+      <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td>
     </tr>`;
   }).join("");
   w.innerHTML = `<table><thead><tr>
@@ -1285,6 +1504,7 @@ async function muatBuku(tabel){
       <th class="kanan">Kredit</th><th class="kanan">Saldo</th><th>Bukti Transaksi</th><th></th>
     </tr></thead><tbody>${baris}</tbody>
     <tfoot><tr><th colspan="5" class="kanan">Saldo akhir</th><th class="kanan num">${rp(saldo)}</th><th colspan="2"></th></tr></tfoot></table>`;
+  pasangUbah(tabel, data, BIDANG[tabel], ()=>muatBuku(tabel), "Ubah baris cashflow");
   pasangHapus(tabel, ()=>muatBuku(tabel));
 }
 
@@ -1371,7 +1591,8 @@ async function muatGaji(){
       <td class="kanan">${r.absensi} / ${r.total_hari}</td>
       <td class="kanan">${rp(r.kasbon)}</td>
       <td class="kanan saldo-sel">${rp(r.total)}</td>
-      <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+      <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+  pasangUbah("gaji", data, BIDANG.gaji, muatGaji, "Ubah data gaji");
   pasangHapus("gaji", muatGaji);
 }
 
@@ -1431,7 +1652,8 @@ async function muatOpname(){
     data.map(r=>`<tr>
       <td class="num">${r.nomor}</td><td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td>
       <td><span class="lencana ${r.kondisi==="Baik"?"baik":"rusak"}">${r.kondisi}</span></td>
-      <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+      <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+  pasangUbah("stock_opname", data, BIDANG.stock_opname, muatOpname, "Ubah catatan opname");
   pasangHapus("stock_opname", muatOpname);
 }
 
@@ -1499,7 +1721,7 @@ async function muatStokBuah(){
         <input type="checkbox" class="ubah-aktif" data-id="${r.id}" ${r.aktif?"checked":""}
           style="width:17px;height:17px;accent-color:var(--biru)"> ${r.aktif?"Ya":"Tidak"}</label></td>
       <td><button class="tombol garis simpan-baris" data-id="${r.id}" style="padding:6px 13px;font-size:13px">Simpan</button></td>
-      <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
+      <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
   siapkanUang();
 
   document.querySelectorAll(".simpan-baris").forEach(b => b.addEventListener("click", async () => {
@@ -1514,38 +1736,79 @@ async function muatStokBuah(){
     if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
     toast("Baris diperbarui"); muatStokBuah();
   }));
+  pasangUbah("stock_buah", data, BIDANG.stock_buah, muatStokBuah, "Ubah jenis buah");
   pasangHapus("stock_buah", muatStokBuah);
 }
 
 /* =====================================================================
    14. MANAJEMEN — DATA KASIR
    ===================================================================== */
-async function layarDataKasir(tabel){
-  const jual = tabel==="penjualan";
-  const { data } = await sb.from(tabel).select("*")
-    .order("tanggal",{ascending:false}).order("created_at",{ascending:false}).limit(300);
-  const total=(data||[]).reduce((a,r)=>a+Number((jual?r.total:r.nominal)||0),0);
+let saringData = null, tabelData = null;
+
+function layarDataKasir(tabel){
+  tabelData = tabel;
+  saringData = buatFilter();
+  const jual = tabel === "penjualan";
 
   $("#layar").innerHTML = judul(jual?"Data Penjualan":"Data Pengeluaran",
       jual?"Seluruh transaksi yang dicatat kasir.":"Seluruh uang keluar dari laci kasir.") + `
+  <div class="papan" style="margin-bottom:22px"><div class="papan-isi">${kotakFilter("dt")}</div></div>
   <div class="papan">
-    <div class="kepala-papan"><h3>300 catatan terakhir</h3><span class="ket num">Total ${rp(total)}</span></div>
-    <div class="gulung">${ (data&&data.length) ? (jual ? `
-      <table><thead><tr><th>Tanggal</th><th>Buah</th><th class="kanan">Qty</th><th class="kanan">Harga</th><th class="kanan">Total</th><th>Bayar</th><th>Bukti</th><th></th></tr></thead><tbody>` +
-      data.map(r=>`<tr><td>${tglIndo(r.tanggal)}</td><td>${aman(r.jenis_buah)}</td>
-        <td class="kanan">${angka(r.qty)} ${aman(r.satuan)}</td><td class="kanan">${rp(r.harga)}</td>
-        <td class="kanan saldo-sel">${rp(r.total)}</td>
-        <td><span class="lencana ${r.pembayaran==="Cash"?"cash":"tf"}">${aman(r.pembayaran)}</span></td>
-        <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat</a>`:"—"}</td>
-        <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("")+`</tbody></table>` : `
-      <table><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="kanan">Nominal</th><th></th></tr></thead><tbody>` +
-      data.map(r=>`<tr><td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td>
-        <td class="kanan saldo-sel">${rp(r.nominal)}</td>
-        <td><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("")+`</tbody></table>`)
-      : kosong("Belum ada data","Kasir belum menyimpan catatan apa pun.") }
+    <div class="kepala-papan">
+      <h3 id="dtJudul">—</h3>
+      <span class="ket num" id="dtTotal">—</span>
     </div>
+    <div class="gulung" id="dtIsi"><div class="memuat">Memuat…</div></div>
   </div>`;
-  pasangHapus(tabel, ()=>layarDataKasir(tabel));
+
+  pasangFilter("dt", saringData, muatDataKasir);
+  muatDataKasir();
+}
+
+async function muatDataKasir(){
+  const tabel = tabelData, st = saringData, jual = tabel === "penjualan";
+  const w = $("#dtIsi"); if(!w) return;
+  w.innerHTML = `<div class="memuat">Memuat…</div>`;
+
+  const { data, error } = await sb.from(tabel).select("*")
+    .gte("tanggal", st.dari).lte("tanggal", st.sampai)
+    .order("tanggal",{ascending:false}).order("created_at",{ascending:false}).limit(500);
+
+  if(error){ w.innerHTML = kosong("Tidak bisa memuat data", aman(error.message)); return; }
+  const baris = data || [];
+  const total = baris.reduce((a,r)=>a+Number((jual?r.total:r.nominal)||0),0);
+
+  $("#dtJudul").textContent = labelRentang(st) + " · " + baris.length + " catatan";
+  $("#dtTotal").textContent = "Total " + rp(total);
+
+  if(!baris.length){
+    w.innerHTML = kosong("Tidak ada data", "Tidak ada catatan pada " + labelRentang(st).toLowerCase() + ".");
+    return;
+  }
+
+  w.innerHTML = jual ? `
+    <table><thead><tr><th>Tanggal</th><th>Buah</th><th class="kanan">Qty</th><th class="kanan">Harga</th>
+      <th class="kanan">Total</th><th>Bayar</th><th>Bukti</th><th></th></tr></thead><tbody>` +
+    baris.map(r=>`<tr>
+      <td>${tglIndo(r.tanggal)}</td><td>${aman(r.jenis_buah)}</td>
+      <td class="kanan">${angka(r.qty)} ${aman(r.satuan)}</td><td class="kanan">${rp(r.harga)}</td>
+      <td class="kanan saldo-sel">${rp(r.total)}</td>
+      <td><span class="lencana ${r.pembayaran==="Cash"?"cash":"tf"}">${aman(r.pembayaran)}</span></td>
+      <td>${r.bukti_url?`<a href="${aman(r.bukti_url)}" target="_blank" rel="noopener">Lihat</a>`:"—"}</td>
+      <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td>
+    </tr>`).join("") + `</tbody></table>
+    <p class="catatan" style="padding:14px 18px">Mengubah jumlah atau jenis buah di sini ikut membetulkan sisa stok secara otomatis.</p>`
+  : `
+    <table><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="kanan">Nominal</th><th></th></tr></thead><tbody>` +
+    baris.map(r=>`<tr>
+      <td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td>
+      <td class="kanan saldo-sel">${rp(r.nominal)}</td>
+      <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td>
+    </tr>`).join("") + `</tbody></table>`;
+
+  pasangUbah(tabel, baris, BIDANG[tabel], muatDataKasir,
+    jual ? "Ubah transaksi penjualan" : "Ubah pengeluaran");
+  pasangHapus(tabel, muatDataKasir);
 }
 
 /* =====================================================================

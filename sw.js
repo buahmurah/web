@@ -1,6 +1,6 @@
 /* buahmurah.id — service worker
    Naikkan angka VERSI setiap kali index.html diubah, supaya HP mengambil versi baru. */
-const VERSI = "buahmurah-v3";
+const VERSI = "buahmurah-v4";
 const RANGKA = [
   "./",
   "./index.html",

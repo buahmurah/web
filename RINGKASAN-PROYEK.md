@@ -1,4 +1,4 @@
-# buahmurah.id — Ringkasan Proyek (v4)
+# buahmurah.id — Ringkasan Proyek (v5)
 
 > Berkas ini dibuat untuk dilampirkan ke percakapan Claude yang baru supaya pengerjaan
 > bisa dilanjutkan tanpa mengulang penjelasan dari nol. Lampirkan file ini bersama
@@ -185,6 +185,23 @@ kasir" semuanya bisa diedit langsung di tabel. Layar kasir membaca daftar buah d
 lengkap dengan sisa stok di tiap pilihan — jadi tidak ada lagi buah yang muncul di kasir
 tapi sudah dihapus manajemen.
 
+**Ubah baris.** Semua tabel manajemen punya tombol Ubah per baris: cashflow, kulakan,
+gaji, stock opname, stock buah, serta data penjualan dan pengeluaran dari kasir. Formnya
+dibangun otomatis dari `BIDANG[tabel]`, jadi menambah kolom yang bisa diedit cukup dengan
+menambah satu entri di sana.
+
+**Stok otomatis.** Trigger `on_penjualan_stok` memotong `stock_buah.jumlah` setiap kali
+kasir menyimpan penjualan, mengembalikannya saat baris dihapus, dan menghitung selisihnya
+saat jumlah atau jenis buah diubah. Sisa stok ikut ditampilkan di tiap pilihan buah pada
+layar kasir dan disegarkan setiap selesai menyimpan. Kalau jumlah jual melebihi stok
+tercatat, muncul peringatan tapi transaksi tetap disimpan — supaya kasir tidak terhambat
+ketika pencatatan stok belum rapi.
+
+**Filter tanggal.** Data Penjualan, Data Pengeluaran, dan Riwayat kasir memakai satu
+komponen filter yang sama: Hari ini, Kemarin, 7 hari, Bulan ini, dan Rentang tanggal.
+Bawaannya Hari ini. Fungsinya `buatFilter()`, `kotakFilter(pre)`, `pasangFilter(pre, st,
+muatUlang)`, dan `labelRentang(st)`.
+
 **Header dan navigasi.** Setiap halaman punya header berisi sapaan dengan nama yang login,
 tanggal dan jam berjalan (diperbarui tiap detik), lonceng notifikasi, dan avatar bundar
 berisi inisial. Avatar diklik memunculkan pop-up profil dengan tombol Akun saya dan Keluar.
@@ -229,7 +246,7 @@ memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke do
 - Font Plus Jakarta Sans, angka memakai `font-variant-numeric: tabular-nums`.
 - Sidebar di layar lebar, tab bawah di layar ≤960px, padding `env(safe-area-inset-*)`.
 - **Naikkan angka `VERSI` di `sw.js` setiap kali `index.html` diubah**, kalau tidak HP
-  akan tetap membuka versi lama dari cache. Sekarang bernilai `buahmurah-v3`.
+  akan tetap membuka versi lama dari cache. Sekarang bernilai `buahmurah-v4`.
 
 ---
 
@@ -237,17 +254,20 @@ memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke do
 
 1. **Web Push sungguhan** supaya notifikasi tetap masuk saat aplikasi tertutup — perlu
    kunci VAPID, tabel langganan push, dan pengirim di Edge Function.
-2. **Stok tidak berkurang otomatis.** Penjualan belum memotong `stock_buah`, dan kulakan
-   belum menambahnya. Sengaja dipisah karena kulakan sering masuk per peti sementara
-   penjualan per Kg, jadi perlu faktor konversi dulu.
+2. **Kulakan belum menambah stok.** Penjualan sudah memotong stok otomatis, tapi kulakan
+   belum menambahnya, karena kolom Keterangan masih teks bebas dan satuannya sering beda
+   (peti vs Kg). Perlu kolom `jenis_buah` tersendiri di tabel kulakan plus faktor konversi
+   satuan sebelum ini bisa otomatis.
 3. **Laporan dan ekspor.** Belum ada rekap per periode, grafik, atau unduh Excel/PDF.
 5. **Edit baris pembukuan.** Cashflow, kulakan, gaji, dan opname hanya bisa ditambah dan
    dihapus, belum bisa diedit.
 6. **Kolom `profiles.aktif`** sudah ada tapi belum dipakai untuk menonaktifkan akun.
 7. **Antrean offline.** Aplikasi tetap terbuka tanpa sinyal, tapi menyimpan transaksi
    masih butuh internet.
-8. **Pencarian dan filter tanggal** pada tabel data belum ada; masih dibatasi 100–300
-   baris terakhir.
+8. **Pencarian teks** pada tabel data belum ada (filter tanggal sudah). Hasil query
+   dibatasi 300–500 baris per rentang.
+9. **Cashflow dan Kulakan belum berfilter tanggal** — keduanya masih menampilkan seluruh
+   buku karena saldo berjalan perlu dihitung dari awal.
 
 ---
 

@@ -1,5 +1,5 @@
 -- =====================================================================
--- buahmurah.id — Skema Supabase v4
+-- buahmurah.id — Skema Supabase v5
 -- Project: https://uuorhkhpubkvsilsybvw.supabase.co
 --
 -- Jalankan SELURUH isi berkas ini di Supabase Dashboard > SQL Editor > Run.
@@ -355,6 +355,54 @@ create trigger on_pengeluaran_notif
   after insert on public.pengeluaran
   for each row execute function public.notif_pengeluaran();
 
+-- ---------------------------------------------------------------------
+-- 7b. STOK OTOMATIS — sisa buah ikut berkurang saat kasir menjual
+-- ---------------------------------------------------------------------
+create or replace function public.stok_dari_penjualan()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if (TG_OP = 'INSERT') then
+    update public.stock_buah
+      set jumlah = jumlah - new.qty, updated_at = now()
+      where jenis_buah = new.jenis_buah;
+
+  elsif (TG_OP = 'DELETE') then
+    update public.stock_buah
+      set jumlah = jumlah + old.qty, updated_at = now()
+      where jenis_buah = old.jenis_buah;
+
+  elsif (TG_OP = 'UPDATE') then
+    if old.jenis_buah is distinct from new.jenis_buah then
+      -- buah diganti: kembalikan ke yang lama, potong dari yang baru
+      update public.stock_buah
+        set jumlah = jumlah + old.qty, updated_at = now()
+        where jenis_buah = old.jenis_buah;
+      update public.stock_buah
+        set jumlah = jumlah - new.qty, updated_at = now()
+        where jenis_buah = new.jenis_buah;
+    elsif old.qty is distinct from new.qty then
+      update public.stock_buah
+        set jumlah = jumlah - (new.qty - old.qty), updated_at = now()
+        where jenis_buah = new.jenis_buah;
+    end if;
+  end if;
+  return null;
+end $$;
+
+drop trigger if exists on_penjualan_stok on public.penjualan;
+create trigger on_penjualan_stok
+  after insert or update or delete on public.penjualan
+  for each row execute function public.stok_dari_penjualan();
+
+-- Menyamakan stok dengan riwayat penjualan yang SUDAH ada sebelum trigger dipasang.
+-- Jalankan HANYA SEKALI, dan hanya kalau angka stokmu belum memperhitungkan penjualan lama.
+-- Hapus tanda komentar di bawah kalau memang mau dipakai.
+--
+-- update public.stock_buah s
+-- set jumlah = s.jumlah - coalesce((
+--       select sum(p.qty) from public.penjualan p where p.jenis_buah = s.jenis_buah), 0),
+--     updated_at = now();
+
 -- Realtime: supaya notifikasi langsung muncul tanpa muat ulang
 do $$ begin
   alter publication supabase_realtime add table public.notifikasi;
@@ -401,6 +449,10 @@ create policy jual_read on public.penjualan
 drop policy if exists jual_insert on public.penjualan;
 create policy jual_insert on public.penjualan
   for insert to authenticated with check (user_id = auth.uid() or public.is_manajemen());
+drop policy if exists jual_update on public.penjualan;
+create policy jual_update on public.penjualan
+  for update to authenticated
+  using (public.is_manajemen()) with check (public.is_manajemen());
 drop policy if exists jual_delete on public.penjualan;
 create policy jual_delete on public.penjualan
   for delete to authenticated
@@ -412,6 +464,10 @@ create policy keluar_read on public.pengeluaran
 drop policy if exists keluar_insert on public.pengeluaran;
 create policy keluar_insert on public.pengeluaran
   for insert to authenticated with check (user_id = auth.uid() or public.is_manajemen());
+drop policy if exists keluar_update on public.pengeluaran;
+create policy keluar_update on public.pengeluaran
+  for update to authenticated
+  using (public.is_manajemen()) with check (public.is_manajemen());
 drop policy if exists keluar_delete on public.pengeluaran;
 create policy keluar_delete on public.pengeluaran
   for delete to authenticated
