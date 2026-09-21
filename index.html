@@ -71,6 +71,9 @@ label{display:block;font-size:13.5px;font-weight:600;margin-bottom:7px}
   width:100%;padding:13px 15px;border:1.5px solid var(--garis);border-radius:var(--r-kecil);
   background:var(--putih);transition:border-color .15s}
 .isian:focus{border-color:var(--biru);outline:none;box-shadow:0 0 0 3px var(--biru-kabut)}
+select.isian{min-width:0;max-width:100%;text-overflow:ellipsis}
+#app{max-width:100vw;overflow-x:clip}
+main,.papan,.papan-isi{min-width:0}
 .grup{margin-bottom:18px}
 .tombol-utama{
   width:100%;background:var(--biru);color:#fff;font-weight:700;padding:14px;
@@ -144,6 +147,22 @@ main{padding:0 34px 90px;min-width:0}
 .tombol.kecil{padding:9px 13px;font-size:13.5px;display:inline-flex;align-items:center;gap:7px}
 .nama-bukti{font-size:13px;color:var(--teks-lembut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
+/* ============ FORM BERSAMA ============ */
+.cek-baris{display:flex;align-items:center;gap:9px;margin:0;font-weight:600;cursor:pointer;padding:12px 0}
+.cek-baris input{width:18px;height:18px;accent-color:var(--biru);flex-shrink:0}
+.bukti-lama{
+  display:flex;align-items:center;gap:14px;padding:10px;margin-bottom:10px;
+  border:1px solid var(--garis);border-radius:var(--r-kecil);background:#F8FBFF}
+.bukti-pratinjau{
+  width:72px;height:72px;border-radius:9px;overflow:hidden;flex-shrink:0;background:var(--biru-kabut);
+  display:flex;align-items:center;justify-content:center;color:var(--biru)}
+.bukti-pratinjau{position:relative}
+.bukti-pratinjau img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.bukti-lama-teks{font-size:13.5px;min-width:0}
+.bukti-lama.dihapus .bukti-pratinjau,.bukti-lama.dihapus .bukti-lama-teks > a{opacity:.3}
+.bukti-lama.dihapus .bukti-lama-teks > div{text-decoration:line-through}
+.ket-bukti{font-size:13px;color:var(--teks-lembut);margin-bottom:7px}
+
 /* ============ FILTER TANGGAL ============ */
 .filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .cip{
@@ -152,7 +171,9 @@ main{padding:0 34px 90px;min-width:0}
 .cip:hover{border-color:var(--biru);color:var(--biru)}
 .cip.aktif{background:var(--biru-tua);border-color:var(--biru-tua);color:#fff}
 .rentang{display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%;margin-top:6px}
-.rentang input{padding:9px 12px;border:1.5px solid var(--garis);border-radius:var(--r-kecil);background:#fff}
+.rentang input{
+  padding:9px 12px;border:1.5px solid var(--garis);border-radius:var(--r-kecil);background:#fff;
+  min-width:0;flex:1 1 140px}
 .rentang .antara{color:var(--teks-lembut);font-size:13.5px}
 
 /* ============ MENU LAINNYA ============ */
@@ -179,8 +200,8 @@ main{padding:0 34px 90px;min-width:0}
 .tombol:disabled{opacity:.5;cursor:not-allowed}
 
 /* ============ KASIR ============ */
-.kasir{display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start}
-.baris2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.kasir{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
+.baris2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 .pilih-bayar{display:flex;gap:10px}
 .pilih-bayar button{
   flex:1;padding:13px;border:1.5px solid var(--garis);border-radius:var(--r-kecil);
@@ -196,7 +217,7 @@ main{padding:0 34px 90px;min-width:0}
   color:var(--biru-tua);font-weight:700;border-radius:0 var(--r-kecil) var(--r-kecil) 0;border:1.5px solid var(--garis);border-left:none}
 .satuan-awal{border-radius:var(--r-kecil) 0 0 var(--r-kecil);border:1.5px solid var(--garis);border-right:none}
 .dengan-satuan{display:flex}
-.dengan-satuan .isian{height:48px;border-radius:0}
+.dengan-satuan .isian{height:48px;border-radius:0;min-width:0;flex:1 1 auto}
 .dengan-satuan .isian:first-child{border-radius:var(--r-kecil) 0 0 var(--r-kecil)}
 .dengan-satuan .isian:last-child{border-radius:0 var(--r-kecil) var(--r-kecil) 0}
 .total-bar{
@@ -267,11 +288,11 @@ td.kanan,th.kanan{font-variant-numeric:tabular-nums}
 /* ============ HP ============ */
 .nav-bawah{display:none}
 @media(max-width:960px){
-  #app.tampil{grid-template-columns:1fr}
+  #app.tampil{grid-template-columns:minmax(0,1fr)}
   .sisi{display:none}
   main{padding:0 16px calc(100px + var(--aman-bawah))}
-  .kasir{grid-template-columns:1fr}
-  .baris2{grid-template-columns:1fr}
+  .kasir{grid-template-columns:minmax(0,1fr)}
+  .baris2{grid-template-columns:minmax(0,1fr)}
   .judul h2{font-size:22px}
   .papan-isi{padding:18px}
   .kepala-papan{padding:14px 18px}
@@ -281,7 +302,19 @@ td.kanan,th.kanan{font-variant-numeric:tabular-nums}
     padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
   .kepala .logo-petak{display:flex;width:36px;height:36px;border-radius:11px}
   .sapa{font-size:15.5px}
-  .jam{font-size:12px}
+  .jam{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kepala{gap:10px}
+  .kepala-kiri{flex:1 1 auto;gap:10px}
+  .kepala-kanan{gap:8px}
+  .isian,.stepper input,.rentang input,select,textarea,input[type="text"],
+  input[type="email"],input[type="password"],input[type="number"],input[type="date"],input[type="month"]{font-size:16px}
+  .total-bar{padding:16px 18px}
+  .total-bar .ag{font-size:26px}
+  .stat .ag{font-size:22px}
+  .stepper button{width:44px}
+  .satuan-tag{padding:0 10px}
+  .judul{margin-bottom:16px}
+  .judul p{font-size:13.5px}
   .lonceng,.avatar{width:38px;height:38px}
   .nav-bawah{
     display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--biru-tua);
@@ -308,8 +341,24 @@ td.kanan,th.kanan{font-variant-numeric:tabular-nums}
   font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;line-height:18px}
 .lonceng .titik.ada{display:block}
 .daftar-notif{display:flex;flex-direction:column;gap:2px}
-.notif{padding:13px 14px;border-radius:var(--r-kecil);border:1px solid var(--garis);margin-bottom:8px}
-.notif.baru{border-color:#BBD4FA;background:var(--biru-kabut)}
+.notif{
+  display:block;width:100%;text-align:left;padding:13px 14px;border-radius:var(--r-kecil);
+  border:1px solid var(--garis);margin-bottom:8px;background:#fff;transition:.15s;position:relative}
+.notif:hover{border-color:var(--biru)}
+.notif.baru{border-color:#BBD4FA;background:var(--biru-kabut);padding-left:26px}
+.notif.baru::before{
+  content:"";position:absolute;left:11px;top:19px;width:7px;height:7px;border-radius:50%;background:var(--biru)}
+.bilah-notif{
+  position:sticky;top:-22px;z-index:2;background:#fff;
+  margin:-22px -24px 16px;padding:13px 24px;border-bottom:1px solid var(--garis);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bilah-notif .info{font-size:13.5px;font-weight:600;color:var(--teks-lembut)}
+.bilah-notif .info strong{color:var(--biru-tua)}
+.aksi-mini:disabled{opacity:.4;cursor:default}
+.lebih-notif{
+  width:100%;padding:12px;border-radius:var(--r-kecil);border:1.5px dashed #C5DAFB;
+  color:var(--biru);font-weight:700;font-size:14px;background:#fff;margin-top:2px}
+.lebih-notif:hover{background:var(--biru-kabut)}
 .notif .nj{font-weight:700;font-size:14.5px}
 .notif .np{font-size:14px;margin-top:2px}
 .notif .nw{font-size:12.5px;color:var(--teks-lembut);margin-top:5px}
@@ -614,95 +663,363 @@ function pasangFilter(pre, st, muatUlang){
   });
 }
 
-/* ---- Form ubah baris yang dipakai ulang di semua tabel manajemen ---- */
-function formBidang(bidang, baris){
-  return `<div class="kisi">` + bidang.map(f => {
-    const v = baris[f.key] ?? "";
-    const rentang = f.lebar ? ' style="grid-column:span 2"' : "";
-    if(f.tipe === "pilih")
-      return `<div${rentang}><label>${f.label}</label><select class="isian" data-k="${f.key}">` +
-        f.opsi.map(o => `<option${String(o)===String(v)?" selected":""}>${o}</option>`).join("") +
-        `</select></div>`;
-    if(f.tipe === "uang")
-      return `<div${rentang}><label>${f.label}</label>
-        <input class="isian num uang" data-k="${f.key}" type="text" value="${Number(v)||0}"></div>`;
-    if(f.tipe === "angka")
-      return `<div${rentang}><label>${f.label}</label>
-        <input class="isian num" data-k="${f.key}" type="number" min="0" step="${f.langkah||1}" value="${Number(v)||0}"></div>`;
-    const t = f.tipe === "tanggal" ? "date" : f.tipe === "bulan" ? "month" : "text";
-    return `<div${rentang}><label>${f.label}</label>
-      <input class="isian" data-k="${f.key}" type="${t}" value="${aman(v)}"></div>`;
-  }).join("") + `</div>`;
+/* =====================================================================
+   FORMULIR BERSAMA — satu definisi per tabel, dipakai untuk TAMBAH dan UBAH.
+   Menambah kolom cukup di FORM[tabel]; kedua form otomatis ikut.
+   ===================================================================== */
+const SATUAN = ["Kg","Pcs","Peti","Ikat","Dus"];
+
+const B_NOMOR   = {key:"nomor",   label:"Nomor",   tipe:"angka",   nomorOtomatis:true};
+const B_TANGGAL = {key:"tanggal", label:"Tanggal", tipe:"tanggal", wajib:true, bawaan:()=>hariIni()};
+
+const FORM = {
+  cashflow: { bidang: [
+    B_NOMOR, B_TANGGAL,
+    {key:"keterangan", label:"Keterangan", tipe:"teks", lebar:true, wajib:true, contoh:"Setoran penjualan harian"},
+    {key:"debit",  label:"Debit (masuk)",   tipe:"uang", bawaan:0},
+    {key:"kredit", label:"Kredit (keluar)", tipe:"uang", bawaan:0},
+    {key:"bukti_url", label:"Bukti transaksi", tipe:"bukti", folder:"cashflow"}
+  ]},
+
+  kulakan: { bidang: [
+    B_NOMOR, B_TANGGAL,
+    {key:"keterangan", label:"Keterangan", tipe:"teks", lebar:true, wajib:true, saran:"buah", contoh:"Apel Fuji dari Pak Dedi"},
+    {key:"jumlah", label:"Jumlah", tipe:"angka", langkah:0.5, lebihDariNol:true, bawaan:0},
+    {key:"satuan", label:"Satuan", tipe:"pilih", opsi:SATUAN, bawaan:"Kg"},
+    {key:"harga",  label:"Harga per satuan", tipe:"uang", bawaan:0},
+    {key:"total",  label:"Total belanja", tipe:"total", rumus:v => (v.jumlah||0) * (v.harga||0)},
+    {key:"bukti_url", label:"Bukti transaksi", tipe:"bukti", folder:"kulakan"}
+  ]},
+
+  gaji: { bidang: [
+    B_NOMOR,
+    {key:"nama",  label:"Nama karyawan", tipe:"teks", wajib:true, contoh:"Nama"},
+    {key:"bulan", label:"Bulan", tipe:"bulan", wajib:true, bawaan:()=>bulanIni()},
+    {key:"absensi",    label:"Absensi (hari masuk)", tipe:"angka", bawaan:0},
+    {key:"total_hari", label:"Total hari kerja",     tipe:"angka", bawaan:26},
+    {key:"upah_harian",label:"Upah per hari", tipe:"uang", bawaan:0},
+    {key:"kasbon",     label:"Kasbon",        tipe:"uang", bawaan:0},
+    {key:"total", label:"Total diterima", tipe:"uang", bawaan:0,
+      dari:["absensi","upah_harian","kasbon"],
+      otomatis:v => (v.absensi||0) * (v.upah_harian||0) - (v.kasbon||0)}
+  ]},
+
+  stock_opname: { bidang: [
+    B_NOMOR, B_TANGGAL,
+    {key:"keterangan", label:"Keterangan", tipe:"teks", lebar:true, wajib:true, contoh:"Apel Fuji 3 Kg lembek"},
+    {key:"kondisi", label:"Kondisi", tipe:"pilih", opsi:["Baik","Rusak"], bawaan:"Baik"}
+  ]},
+
+  stock_buah: { bidang: [
+    {key:"jenis_buah", label:"Jenis buah", tipe:"teks", wajib:true, contoh:"Durian Montong"},
+    {key:"jumlah", label:"Jumlah", tipe:"angka", langkah:0.5, bawaan:0},
+    {key:"satuan", label:"Satuan", tipe:"pilih", opsi:SATUAN, bawaan:"Kg"},
+    {key:"harga",  label:"Harga jual per satuan", tipe:"uang", bawaan:0},
+    {key:"aktif",  label:"Tampil di layar kasir", tipe:"cek", bawaan:true}
+  ]},
+
+  /* Dua form di bawah meniru layar kasir, untuk dipakai manajemen saat mengubah */
+  penjualan: { bidang: [
+    {key:"tanggal", label:"Tanggal", tipe:"tanggal", wajib:true},
+    {key:"jenis_buah", label:"Jenis buah", tipe:"pilihBuah", lebar:true, wajib:true},
+    {key:"qty",    label:"Jumlah", tipe:"angka", langkah:0.5, lebihDariNol:true},
+    {key:"satuan", label:"Satuan", tipe:"pilih", opsi:SATUAN},
+    {key:"harga",  label:"Harga per satuan", tipe:"uang"},
+    {key:"total",  label:"Total dibayar", tipe:"total", rumus:v => (v.qty||0) * (v.harga||0)},
+    {key:"pembayaran", label:"Pembayaran", tipe:"bayar", wajib:true, pesanWajib:"Pilih dulu: Cash atau Transfer."},
+    {key:"bukti_url", label:"Bukti transfer (opsional)", tipe:"bukti", folder:"penjualan",
+      tampilJika:v => v.pembayaran === "Transfer"}
+  ]},
+
+  pengeluaran: { bidang: [
+    {key:"tanggal", label:"Tanggal", tipe:"tanggal", wajib:true},
+    {key:"nominal", label:"Nominal", tipe:"uang", lebihDariNol:true},
+    {key:"keterangan", label:"Keterangan", tipe:"teks", lebar:true, wajib:true, contoh:"Beli plastik kemasan"}
+  ]}
+};
+
+/* Daftar buah dari stok, dipakai oleh pilihan buah dan saran keterangan */
+let dataBuah = [];
+async function siapkanDataForm(def){
+  if(def.bidang.some(f => f.tipe === "pilihBuah" || f.saran === "buah")){
+    const { data } = await sb.from("stock_buah")
+      .select("jenis_buah,satuan,harga,jumlah,aktif").order("jenis_buah");
+    dataBuah = data || [];
+  }
 }
-function nilaiBidang(bidang){
-  const isi = {};
-  bidang.forEach(f => {
-    const el = document.querySelector(`#modalIsi [data-k="${f.key}"]`);
-    if(!el) return;
-    isi[f.key] = f.tipe === "uang"  ? uang(el)
-               : f.tipe === "angka" ? (Number(el.value) || 0)
-               : el.value;
+
+async function nilaiAwal(def, tabel){
+  const v = {};
+  def.bidang.forEach(f => {
+    if(f.bawaan !== undefined) v[f.key] = typeof f.bawaan === "function" ? f.bawaan() : f.bawaan;
   });
-  return isi;
+  if(def.bidang.some(f => f.nomorOtomatis)){
+    const { data } = await sb.from(tabel).select("nomor").order("nomor",{ascending:false}).limit(1);
+    v.nomor = data && data.length ? Number(data[0].nomor) + 1 : 1;
+  }
+  return v;
 }
-function ubahBaris(tabel, baris, bidang, muatUlang, judulTeks){
-  bukaModal(judulTeks || "Ubah baris", formBidang(bidang, baris), async () => {
-    const isi = nilaiBidang(bidang);
-    if(isi.keterangan !== undefined && !String(isi.keterangan).trim()){
-      toast("Keterangan belum diisi.","gagal"); return false;
+
+const POLA_GAMBAR = /\.(jpe?g|png|webp|gif|heic|heif)(\?|$)/i;
+
+function htmlBidang(f, val, pre){
+  const atr = `data-k="${f.key}"`;
+  const penuh = f.lebar ? ' style="grid-column:1/-1"' : "";
+  const bungkus = (isi, paksaPenuh) =>
+    `<div data-bidang="${f.key}"${paksaPenuh ? ' style="grid-column:1/-1"' : penuh}>
+       <label>${f.label}</label>${isi}</div>`;
+
+  switch(f.tipe){
+    case "tanggal":
+      return bungkus(`<input class="isian" ${atr} type="date" value="${aman(val || "")}">`);
+    case "bulan":
+      return bungkus(`<input class="isian" ${atr} type="month" value="${aman(val || "")}">`);
+    case "angka":
+      return bungkus(`<input class="isian num" ${atr} type="number" min="0" step="${f.langkah || 1}"
+        inputmode="decimal" value="${Number(val) || 0}">`);
+    case "uang":
+      return bungkus(`<input class="isian num uang" ${atr} type="text"
+        value="${formatUang(String(Math.round(Number(val) || 0))) || "0"}">`);
+    case "pilih": {
+      const opsi = [...f.opsi];
+      if(val && !opsi.map(String).includes(String(val))) opsi.push(val);
+      return bungkus(`<select class="isian" ${atr}>` +
+        opsi.map(o => `<option${String(o) === String(val) ? " selected" : ""}>${aman(o)}</option>`).join("") +
+        `</select>`);
     }
-    const { error } = await sb.from(tabel).update(isi).eq("id", baris.id);
-    if(error){ toast("Gagal menyimpan: "+error.message,"gagal"); return false; }
+    case "cek":
+      return `<div data-bidang="${f.key}" style="display:flex;align-items:flex-end">
+        <label class="cek-baris"><input type="checkbox" ${atr}${val ? " checked" : ""}> ${f.label}</label></div>`;
+    case "pilihBuah": {
+      const ada = dataBuah.some(b => b.jenis_buah === val);
+      const opsi =
+        (val && !ada ? `<option value="${aman(val)}" selected>${aman(val)} (sudah tidak ada di stok)</option>` : "") +
+        dataBuah.map(b => `<option value="${aman(b.jenis_buah)}" data-satuan="${aman(b.satuan)}"
+            data-harga="${b.harga || 0}"${b.jenis_buah === val ? " selected" : ""}>${aman(b.jenis_buah)}
+            — sisa ${angka(b.jumlah)} ${aman(b.satuan)}</option>`).join("");
+      return bungkus(`<select class="isian" ${atr}><option value="">— pilih buah —</option>${opsi}</select>`);
+    }
+    case "bayar":
+      return bungkus(`<input type="hidden" ${atr} value="${aman(val || "")}">
+        <div class="pilih-bayar">` +
+        ["Cash","Transfer"].map(o =>
+          `<button type="button" data-pilih-bayar="${o}" class="${o === val ? "aktif" : ""}">${o}</button>`).join("") +
+        `</div>`, true);
+    case "total":
+      return `<div data-bidang="${f.key}" style="grid-column:1/-1">
+        <div class="total-bar" style="margin:0"><span class="lb">${f.label}</span>
+        <span class="ag num" data-total="${f.key}">Rp 0</span></div></div>`;
+    case "bukti": {
+      const p = pre + "B";
+      const lama = val ? `
+        <div class="bukti-lama" id="${p}Lama">
+          <a href="${aman(val)}" target="_blank" rel="noopener" class="bukti-pratinjau">
+            ${ikon("unggah", 26)}
+            ${POLA_GAMBAR.test(val) ? `<img src="${aman(val)}" alt="" onerror="this.remove()">` : ""}
+          </a>
+          <div class="bukti-lama-teks">
+            <div style="font-weight:700">Bukti saat ini</div>
+            <a href="${aman(val)}" target="_blank" rel="noopener">Buka di tab baru</a>
+            <label class="cek-baris" style="padding:6px 0 0">
+              <input type="checkbox" id="${p}Hapus"> Hapus bukti ini</label>
+          </div>
+        </div>
+        <div class="ket-bukti">Atau ganti dengan yang baru:</div>` : "";
+      return `<div data-bidang="${f.key}" style="grid-column:1/-1">
+        <label>${f.label}</label>${lama}${kotakBukti(p)}</div>`;
+    }
+    default: {
+      const saran = f.saran === "buah";
+      return bungkus(`<input class="isian" ${atr} type="text" value="${aman(val || "")}"
+        placeholder="${aman(f.contoh || "")}"${saran ? ` list="${pre}Saran"` : ""}>` +
+        (saran ? `<datalist id="${pre}Saran">` +
+          dataBuah.map(b => `<option value="${aman(b.jenis_buah)}">`).join("") + `</datalist>` : ""));
+    }
+  }
+}
+
+function htmlForm(def, nilai, pre){
+  return `<div class="kisi">` + def.bidang.map(f => htmlBidang(f, nilai[f.key], pre)).join("") + `</div>`;
+}
+
+function nilaiSementara(def, wadah){
+  const v = {};
+  def.bidang.forEach(f => {
+    const el = wadah.querySelector(`[data-k="${f.key}"]`);
+    if(!el) return;
+    if(f.tipe === "uang")       v[f.key] = uang(el);
+    else if(f.tipe === "angka") v[f.key] = Number(el.value) || 0;
+    else if(f.tipe === "cek")   v[f.key] = el.checked;
+    else                        v[f.key] = el.value;
+  });
+  return v;
+}
+
+function pasangForm(def, wadah, pre){
+  siapkanUang();
+
+  if(def.bidang.some(f => f.tipe === "bukti")){
+    const p = pre + "B";
+    pasangBukti(p);
+    const hapus = $("#" + p + "Hapus");
+    if(hapus) hapus.addEventListener("change", () =>
+      $("#" + p + "Lama").classList.toggle("dihapus", hapus.checked));
+  }
+
+  wadah.querySelectorAll("[data-pilih-bayar]").forEach(b => b.addEventListener("click", () => {
+    wadah.querySelector('[data-k="pembayaran"]').value = b.dataset.pilihBayar;
+    wadah.querySelectorAll("[data-pilih-bayar]").forEach(x => x.classList.toggle("aktif", x === b));
+    segarkan();
+  }));
+
+  const pilihBuah = wadah.querySelector('select[data-k="jenis_buah"]');
+  if(pilihBuah) pilihBuah.addEventListener("change", () => {
+    const o = pilihBuah.selectedOptions[0];
+    const sat = wadah.querySelector('[data-k="satuan"]');
+    const hrg = wadah.querySelector('[data-k="harga"]');
+    if(o && o.dataset.satuan && sat) sat.value = o.dataset.satuan;
+    if(o && o.dataset.harga && hrg)  hrg.value = formatUang(o.dataset.harga) || "0";
+    segarkan();
+  });
+
+  const saran = wadah.querySelector("input[list]");
+  if(saran) saran.addEventListener("input", () => {
+    const cocok = dataBuah.find(b => b.jenis_buah === saran.value);
+    const sat = wadah.querySelector('[data-k="satuan"]');
+    if(cocok && sat) sat.value = cocok.satuan;
+  });
+
+  function segarkan(e){
+    const v = nilaiSementara(def, wadah);
+    const pemicu = e && e.target && e.target.dataset ? e.target.dataset.k : null;
+    def.bidang.forEach(f => {
+      if(f.otomatis && pemicu && f.dari.includes(pemicu)){
+        const el = wadah.querySelector(`[data-k="${f.key}"]`);
+        if(el) el.value = formatUang(String(Math.max(0, Math.round(f.otomatis(v))))) || "0";
+      }
+    });
+    const v2 = nilaiSementara(def, wadah);
+    def.bidang.forEach(f => {
+      if(f.tipe === "total"){
+        const el = wadah.querySelector(`[data-total="${f.key}"]`);
+        if(el) el.textContent = rp(f.rumus(v2));
+      }
+      if(f.tampilJika){
+        const kotak = wadah.querySelector(`[data-bidang="${f.key}"]`);
+        if(kotak) kotak.style.display = f.tampilJika(v2) ? "" : "none";
+      }
+    });
+  }
+  wadah.addEventListener("input", segarkan);
+  wadah.addEventListener("change", segarkan);
+  segarkan();
+}
+
+async function bacaForm(def, wadah, pre, lama){
+  const v = nilaiSementara(def, wadah);
+
+  for(const f of def.bidang){
+    const terlihat = !f.tampilJika || f.tampilJika(v);
+    if(!terlihat) continue;
+    if(f.wajib && (v[f.key] === undefined || String(v[f.key]).trim() === ""))
+      return { error: f.pesanWajib || (f.label + " belum diisi.") };
+    if(f.lebihDariNol && !(Number(v[f.key]) > 0))
+      return { error: f.label + " harus lebih dari nol." };
+  }
+
+  const isi = {};
+  for(const f of def.bidang){
+    if(f.tipe === "total") continue;
+
+    if(f.tipe === "bukti"){
+      const p = pre + "B";
+      const terlihat = !f.tampilJika || f.tampilJika(v);
+      if(!terlihat){ isi[f.key] = null; continue; }           // mis. diganti ke Cash
+      if(berkasBukti(p)){
+        const h = await unggahBukti(p, f.folder);
+        if(h.error) return { error: "Bukti gagal diunggah: " + h.error };
+        isi[f.key] = h.url;                                    // ganti foto
+      } else if($("#" + p + "Hapus") && $("#" + p + "Hapus").checked){
+        isi[f.key] = null;                                     // hapus foto
+      } else if(!lama){
+        isi[f.key] = null;                                     // tambah tanpa foto
+      }                                                        // ubah tanpa sentuh foto: biarkan
+      continue;
+    }
+
+    isi[f.key] = typeof v[f.key] === "string" ? v[f.key].trim() : v[f.key];
+  }
+  return { isi };
+}
+
+/* Tombol Ubah per baris → form yang sama persis dengan Tambah */
+async function ubahDenganForm(tabel, baris, muatUlang, judulTeks){
+  const def = FORM[tabel]; if(!def) return;
+  await siapkanDataForm(def);
+  bukaModal(judulTeks || "Ubah data", `<div id="ubForm">${htmlForm(def, baris, "ub")}</div>`, async () => {
+    const hasil = await bacaForm(def, $("#ubForm"), "ub", baris);
+    if(hasil.error){ toast(hasil.error, "gagal"); return false; }
+    const { error } = await sb.from(tabel).update(hasil.isi).eq("id", baris.id);
+    if(error){ toast("Gagal menyimpan: " + error.message, "gagal"); return false; }
     toast("Perubahan tersimpan");
     muatUlang();
   }, "Simpan perubahan");
+  pasangForm(def, $("#ubForm"), "ub");
 }
-function pasangUbah(tabel, data, bidang, muatUlang, judulTeks){
+
+function pasangUbah(tabel, data, muatUlang, judulTeks){
   document.querySelectorAll(".ubah-baris").forEach(b => b.addEventListener("click", () => {
-    const baris = (data||[]).find(r => String(r.id) === b.dataset.id);
-    if(baris) ubahBaris(tabel, baris, bidang, muatUlang, judulTeks);
+    const baris = (data || []).find(r => String(r.id) === b.dataset.id);
+    if(baris) ubahDenganForm(tabel, baris, muatUlang, judulTeks);
   }));
 }
 
-/* Daftar kolom yang boleh diubah, per tabel */
-const SATUAN = ["Kg","Pcs","Peti","Ikat","Dus"];
-const BIDANG = {
-  penjualan:   [{key:"tanggal",label:"Tanggal",tipe:"tanggal"},
-                {key:"jenis_buah",label:"Jenis buah",tipe:"teks",lebar:true},
-                {key:"qty",label:"Jumlah",tipe:"angka",langkah:0.5},
-                {key:"satuan",label:"Satuan",tipe:"pilih",opsi:SATUAN},
-                {key:"harga",label:"Harga per satuan",tipe:"uang"},
-                {key:"pembayaran",label:"Pembayaran",tipe:"pilih",opsi:["Cash","Transfer"]}],
-  pengeluaran: [{key:"tanggal",label:"Tanggal",tipe:"tanggal"},
-                {key:"nominal",label:"Nominal",tipe:"uang"},
-                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true}],
-  cashflow:    [{key:"nomor",label:"Nomor",tipe:"angka"},
-                {key:"tanggal",label:"Tanggal",tipe:"tanggal"},
-                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true},
-                {key:"debit",label:"Debit (masuk)",tipe:"uang"},
-                {key:"kredit",label:"Kredit (keluar)",tipe:"uang"}],
-  kulakan:     [{key:"nomor",label:"Nomor",tipe:"angka"},
-                {key:"tanggal",label:"Tanggal",tipe:"tanggal"},
-                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true},
-                {key:"jumlah",label:"Jumlah",tipe:"angka",langkah:0.5},
-                {key:"satuan",label:"Satuan",tipe:"pilih",opsi:SATUAN},
-                {key:"harga",label:"Harga per satuan",tipe:"uang"}],
-  gaji:        [{key:"nomor",label:"Nomor",tipe:"angka"},
-                {key:"nama",label:"Nama karyawan",tipe:"teks"},
-                {key:"bulan",label:"Bulan",tipe:"bulan"},
-                {key:"absensi",label:"Absensi (hari masuk)",tipe:"angka"},
-                {key:"total_hari",label:"Total hari kerja",tipe:"angka"},
-                {key:"kasbon",label:"Kasbon",tipe:"uang"},
-                {key:"total",label:"Total diterima",tipe:"uang"}],
-  stock_opname:[{key:"nomor",label:"Nomor",tipe:"angka"},
-                {key:"tanggal",label:"Tanggal",tipe:"tanggal"},
-                {key:"keterangan",label:"Keterangan",tipe:"teks",lebar:true},
-                {key:"kondisi",label:"Kondisi",tipe:"pilih",opsi:["Baik","Rusak"]}],
-  stock_buah:  [{key:"jenis_buah",label:"Jenis buah",tipe:"teks",lebar:true},
-                {key:"jumlah",label:"Jumlah",tipe:"angka",langkah:0.5},
-                {key:"satuan",label:"Satuan",tipe:"pilih",opsi:SATUAN},
-                {key:"harga",label:"Harga jual per satuan",tipe:"uang"}]
-};
+/* Layar buku manajemen: tombol Tambah memakai form yang sama dengan Ubah */
+async function layarDenganForm(o){
+  const def = FORM[o.tabel];
+  $("#layar").innerHTML = judul(o.judul, o.ket) + `
+  <div class="papan">
+    <div class="kepala-papan">
+      <h3>${o.judulPapan}</h3>
+      <button class="tombol kuning" id="btnBuka">${o.labelTambah}</button>
+    </div>
+    <div class="form-tambah" id="formTambah"></div>
+    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
+  </div>`;
+
+  const form = $("#formTambah");
+  $("#btnBuka").addEventListener("click", async () => {
+    if(form.classList.contains("buka")){ form.classList.remove("buka"); return; }
+    await siapkanDataForm(def);
+    const awal = await nilaiAwal(def, o.tabel);
+    form.innerHTML = `<div id="tbForm">${htmlForm(def, awal, "tb")}</div>
+      <div style="display:flex;gap:10px">
+        <button class="tombol biru" id="btnSimpan">${o.labelSimpan || "Simpan"}</button>
+        <button class="tombol garis" id="btnBatal">Batal</button>
+      </div>`;
+    pasangForm(def, $("#tbForm"), "tb");
+    form.classList.add("buka");
+    const pertama = form.querySelector("input:not([type=hidden]):not([type=file]), select");
+    if(pertama) pertama.focus();
+
+    $("#btnBatal").addEventListener("click", () => form.classList.remove("buka"));
+    $("#btnSimpan").addEventListener("click", async () => {
+      const b = $("#btnSimpan"), label = b.textContent;
+      b.disabled = true; b.textContent = "Menyimpan…";
+      const hasil = await bacaForm(def, $("#tbForm"), "tb", null);
+      if(hasil.error){ b.disabled = false; b.textContent = label; return toast(hasil.error, "gagal"); }
+      const { error } = await sb.from(o.tabel).insert(hasil.isi);
+      b.disabled = false; b.textContent = label;
+      if(error) return toast("Gagal menyimpan: " + error.message, "gagal");
+      toast("Tersimpan");
+      form.classList.remove("buka");
+      o.muat();
+    });
+  });
+
+  o.muat();
+}
+
 
 let jamToast;
 function toast(teks, jenis="sukses"){
@@ -836,8 +1153,11 @@ function mulaiJam(){
     const d = new Date();
     const el = $("#jamSekarang");
     if(!el) return;
+    const sempit = window.innerWidth < 520;
     el.textContent =
-      d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) +
+      d.toLocaleDateString("id-ID", sempit
+        ? {weekday:"short",day:"numeric",month:"short",year:"numeric"}
+        : {weekday:"long",day:"numeric",month:"long",year:"numeric"}) +
       " · " + d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
   };
   gambar();
@@ -889,7 +1209,7 @@ const SEMUA_MENU = {
   gaji:          {label:"Gaji",             pendek:"Gaji",     grup:"Pembukuan"},
   stock_opname:  {label:"Stock Opname",     pendek:"Opname",   grup:"Gudang"},
   stock_buah:    {label:"Stock Buah",       pendek:"Stok",     grup:"Gudang"},
-  penjualan_m:   {label:"Data Penjualan",   pendek:"Penjualan",grup:"Data kasir"},
+  penjualan_m:   {label:"Data Penjualan",   pendek:"Jualan",   grup:"Data kasir"},
   pengeluaran_m: {label:"Data Pengeluaran", pendek:"Keluar",   grup:"Data kasir"},
   pengguna:      {label:"Pengguna",         pendek:"Pengguna", grup:"Pengaturan", khususManajemen:true},
   profil:        {label:"Akun saya",        pendek:"Akun",     grup:"Pengaturan"}
@@ -1303,148 +1623,25 @@ async function layarRingkasan(){
 /* =====================================================================
    10. MANAJEMEN — CASHFLOW & KULAKAN
    ===================================================================== */
-async function layarCashflow(){
-  const tabel = "cashflow";
-  $("#layar").innerHTML = judul("Cashflow",
-    "Semua uang masuk dan keluar toko. Debit menambah saldo, kredit mengurangi.") + `
-  <div class="papan">
-    <div class="kepala-papan">
-      <h3>Buku Cashflow</h3>
-      <button class="tombol kuning" id="btnBuka">Tambah baris</button>
-    </div>
-    <div class="form-tambah" id="formTambah">
-      <div class="kisi">
-        <div><label>Nomor</label><input id="iNomor" class="isian num" type="number" min="1"></div>
-        <div><label>Tanggal</label><input id="iTgl" class="isian" type="date" value="${hariIni()}"></div>
-        <div style="grid-column:span 2"><label>Keterangan</label><input id="iKet" class="isian" placeholder="Setoran penjualan harian"></div>
-        <div><label>Debit (masuk)</label><input id="iDebit" class="isian num uang" type="text" value="0"></div>
-        <div><label>Kredit (keluar)</label><input id="iKredit" class="isian num uang" type="text" value="0"></div>
-      </div>
-      <div style="margin-bottom:16px"><label>Bukti transaksi</label>${kotakBukti("cf")}</div>
-      <div style="display:flex;gap:10px">
-        <button class="tombol biru" id="btnSimpan">Simpan baris</button>
-        <button class="tombol garis" id="btnBatal">Batal</button>
-      </div>
-    </div>
-    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
-  </div>`;
-  siapkanUang();
-  pasangBukti("cf");
-
-  const form=$("#formTambah");
-  $("#btnBuka").addEventListener("click", async () => {
-    form.classList.toggle("buka");
-    if(form.classList.contains("buka")){
-      const { data } = await sb.from(tabel).select("nomor").order("nomor",{ascending:false}).limit(1);
-      $("#iNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
-      $("#iKet").focus();
-    }
+function layarCashflow(){
+  return layarDenganForm({
+    tabel:"cashflow", judul:"Cashflow",
+    ket:"Semua uang masuk dan keluar toko. Debit menambah saldo, kredit mengurangi.",
+    judulPapan:"Buku Cashflow", labelTambah:"Tambah baris", labelSimpan:"Simpan baris",
+    muat:() => muatBuku("cashflow")
   });
-  $("#btnBatal").addEventListener("click", () => form.classList.remove("buka"));
-
-  $("#btnSimpan").addEventListener("click", async () => {
-    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
-    const hasil = await unggahBukti("cf", tabel);
-    if(hasil.error){ b.disabled=false; b.textContent="Simpan baris"; return toast("Bukti gagal diunggah: "+hasil.error,"gagal"); }
-
-    const { error } = await sb.from(tabel).insert({
-      nomor:+$("#iNomor").value||1, tanggal:$("#iTgl").value||hariIni(),
-      keterangan:$("#iKet").value.trim(), debit:uang("#iDebit"),
-      kredit:uang("#iKredit"), bukti_url:hasil.url
-    });
-    b.disabled=false; b.textContent="Simpan baris";
-    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
-    toast("Baris tersimpan");
-    form.classList.remove("buka");
-    $("#iKet").value=""; $("#iDebit").value="0"; $("#iKredit").value="0"; resetBukti("cf");
-    muatBuku(tabel);
-  });
-
-  muatBuku(tabel);
 }
 
 /* =====================================================================
    10b. MANAJEMEN — KULAKAN (belanja ke supplier)
    ===================================================================== */
-async function layarKulakan(){
-  const { data:buah } = await sb.from("stock_buah").select("jenis_buah,satuan").order("jenis_buah");
-  const pilihanBuah = (buah||[]).map(b =>
-    `<option value="${aman(b.jenis_buah)}" data-satuan="${aman(b.satuan)}">${aman(b.jenis_buah)}</option>`).join("");
-
-  $("#layar").innerHTML = judul("Kulakan",
-    "Catatan belanja buah ke supplier: apa yang dibeli, berapa banyak, dan berapa harganya.") + `
-  <div class="papan">
-    <div class="kepala-papan">
-      <h3>Buku Kulakan</h3>
-      <button class="tombol kuning" id="btnBuka">Tambah baris</button>
-    </div>
-    <div class="form-tambah" id="formTambah">
-      <div class="kisi">
-        <div><label>Nomor</label><input id="kNomor" class="isian num" type="number" min="1"></div>
-        <div><label>Tanggal</label><input id="kTgl" class="isian" type="date" value="${hariIni()}"></div>
-        <div style="grid-column:span 2"><label>Keterangan</label>
-          <input id="kKet" class="isian" list="daftarBuah" placeholder="Apel Fuji dari Pak Dedi">
-          <datalist id="daftarBuah">${pilihanBuah}</datalist></div>
-        <div><label>Jumlah</label><input id="kJumlah" class="isian num" type="number" min="0" step="0.5" value="0"></div>
-        <div><label>Satuan</label><select id="kSatuan" class="isian">
-          <option>Kg</option><option>Pcs</option><option>Peti</option><option>Ikat</option><option>Dus</option></select></div>
-        <div><label>Harga per satuan</label><input id="kHarga" class="isian num uang" type="text" value="0"></div>
-      </div>
-      <div style="margin-bottom:16px"><label>Bukti transaksi</label>${kotakBukti("kl")}</div>
-      <div class="total-bar" style="margin:0 0 16px">
-        <span class="lb">Total belanja</span><span class="ag num" id="kTotal">Rp 0</span>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="tombol biru" id="btnSimpan">Simpan baris</button>
-        <button class="tombol garis" id="btnBatal">Batal</button>
-      </div>
-    </div>
-    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
-  </div>`;
-  siapkanUang();
-  pasangBukti("kl");
-
-  const hitung = () => $("#kTotal").textContent = rp((+$("#kJumlah").value||0) * uang("#kHarga"));
-  $("#kJumlah").addEventListener("input", hitung);
-  $("#kHarga").addEventListener("input", hitung);
-  $("#kKet").addEventListener("input", () => {
-    const cocok = (buah||[]).find(b => b.jenis_buah === $("#kKet").value);
-    if(cocok) $("#kSatuan").value = cocok.satuan;
+function layarKulakan(){
+  return layarDenganForm({
+    tabel:"kulakan", judul:"Kulakan",
+    ket:"Catatan belanja buah ke supplier: apa yang dibeli, berapa banyak, dan berapa harganya.",
+    judulPapan:"Buku Kulakan", labelTambah:"Tambah baris", labelSimpan:"Simpan baris",
+    muat:muatKulakan
   });
-
-  const form=$("#formTambah");
-  $("#btnBuka").addEventListener("click", async () => {
-    form.classList.toggle("buka");
-    if(form.classList.contains("buka")){
-      const { data } = await sb.from("kulakan").select("nomor").order("nomor",{ascending:false}).limit(1);
-      $("#kNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
-      $("#kKet").focus();
-    }
-  });
-  $("#btnBatal").addEventListener("click", () => form.classList.remove("buka"));
-
-  $("#btnSimpan").addEventListener("click", async () => {
-    if(!$("#kKet").value.trim()) return toast("Keterangan belum diisi.","gagal");
-    if(!(+$("#kJumlah").value > 0)) return toast("Jumlah harus lebih dari nol.","gagal");
-    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
-
-    const hasil = await unggahBukti("kl","kulakan");
-    if(hasil.error){ b.disabled=false; b.textContent="Simpan baris"; return toast("Bukti gagal diunggah: "+hasil.error,"gagal"); }
-
-    const { error } = await sb.from("kulakan").insert({
-      nomor:+$("#kNomor").value||1, tanggal:$("#kTgl").value||hariIni(),
-      keterangan:$("#kKet").value.trim(), jumlah:+$("#kJumlah").value||0,
-      satuan:$("#kSatuan").value, harga:uang("#kHarga"), bukti_url:hasil.url
-    });
-    b.disabled=false; b.textContent="Simpan baris";
-    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
-    toast("Baris tersimpan");
-    form.classList.remove("buka");
-    $("#kKet").value=""; $("#kJumlah").value=0; $("#kHarga").value="0"; resetBukti("kl"); hitung();
-    muatKulakan();
-  });
-
-  muatKulakan();
 }
 
 async function muatKulakan(){
@@ -1476,7 +1673,7 @@ async function muatKulakan(){
     </tr></thead><tbody>${baris}</tbody>
     <tfoot><tr><th colspan="6" class="kanan">Total belanja kulakan</th>
       <th class="kanan num">${rp(total)}</th><th colspan="2"></th></tr></tfoot></table>`;
-  pasangUbah("kulakan", data, BIDANG.kulakan, muatKulakan, "Ubah baris kulakan");
+  pasangUbah("kulakan", data, muatKulakan, "Ubah baris kulakan");
   pasangHapus("kulakan", muatKulakan);
 }
 
@@ -1504,7 +1701,7 @@ async function muatBuku(tabel){
       <th class="kanan">Kredit</th><th class="kanan">Saldo</th><th>Bukti Transaksi</th><th></th>
     </tr></thead><tbody>${baris}</tbody>
     <tfoot><tr><th colspan="5" class="kanan">Saldo akhir</th><th class="kanan num">${rp(saldo)}</th><th colspan="2"></th></tr></tfoot></table>`;
-  pasangUbah(tabel, data, BIDANG[tabel], ()=>muatBuku(tabel), "Ubah baris cashflow");
+  pasangUbah(tabel, data, ()=>muatBuku(tabel), "Ubah baris cashflow");
   pasangHapus(tabel, ()=>muatBuku(tabel));
 }
 
@@ -1520,62 +1717,13 @@ function pasangHapus(tabel, muatUlang){
 /* =====================================================================
    11. MANAJEMEN — GAJI
    ===================================================================== */
-async function layarGaji(){
-  $("#layar").innerHTML = judul("Gaji", "Rekap upah bulanan berdasarkan kehadiran dan kasbon.") + `
-  <div class="papan">
-    <div class="kepala-papan"><h3>Daftar gaji</h3>
-      <button class="tombol kuning" id="btnBuka">Tambah gaji</button></div>
-    <div class="form-tambah" id="formTambah">
-      <div class="kisi">
-        <div><label>Nomor</label><input id="gNomor" class="isian num" type="number" min="1"></div>
-        <div><label>Nama karyawan</label><input id="gNama" class="isian" placeholder="Nama"></div>
-        <div><label>Bulan</label><input id="gBulan" class="isian" type="month" value="${bulanIni()}"></div>
-        <div><label>Absensi (hari masuk)</label><input id="gAbsen" class="isian num" type="number" min="0" value="0"></div>
-        <div><label>Total hari kerja</label><input id="gHari" class="isian num" type="number" min="0" value="26"></div>
-        <div><label>Upah per hari</label><input id="gUpah" class="isian num uang" type="text" value="0"></div>
-        <div><label>Kasbon</label><input id="gKasbon" class="isian num uang" type="text" value="0"></div>
-        <div><label>Total diterima</label><input id="gTotal" class="isian num uang" type="text" value="0"></div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="tombol biru" id="btnSimpan">Simpan gaji</button>
-        <button class="tombol garis" id="btnBatal">Batal</button>
-      </div>
-    </div>
-    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
-  </div>`;
-  siapkanUang();
-
-  const hitungTotal = () => {
-    const t=(+$("#gAbsen").value||0)*uang("#gUpah")-uang("#gKasbon");
-    $("#gTotal").value=formatUang(String(Math.max(0,t)));
-  };
-  ["gAbsen","gUpah","gKasbon"].forEach(i=>$("#"+i).addEventListener("input",hitungTotal));
-
-  const form=$("#formTambah");
-  $("#btnBuka").addEventListener("click", async () => {
-    form.classList.toggle("buka");
-    if(form.classList.contains("buka")){
-      const { data } = await sb.from("gaji").select("nomor").order("nomor",{ascending:false}).limit(1);
-      $("#gNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
-      $("#gNama").focus();
-    }
+function layarGaji(){
+  return layarDenganForm({
+    tabel:"gaji", judul:"Gaji",
+    ket:"Rekap upah bulanan. Total terisi otomatis dari absensi × upah per hari − kasbon, dan tetap bisa diubah.",
+    judulPapan:"Daftar gaji", labelTambah:"Tambah gaji", labelSimpan:"Simpan gaji",
+    muat:muatGaji
   });
-  $("#btnBatal").addEventListener("click",()=>form.classList.remove("buka"));
-
-  $("#btnSimpan").addEventListener("click", async () => {
-    if(!$("#gNama").value.trim()) return toast("Nama karyawan belum diisi.","gagal");
-    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
-    const { error } = await sb.from("gaji").insert({
-      nomor:+$("#gNomor").value||1, nama:$("#gNama").value.trim(), bulan:$("#gBulan").value||bulanIni(),
-      absensi:+$("#gAbsen").value||0, total_hari:+$("#gHari").value||0,
-      kasbon:uang("#gKasbon"), total:uang("#gTotal")
-    });
-    b.disabled=false; b.textContent="Simpan gaji";
-    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
-    toast("Data gaji tersimpan"); form.classList.remove("buka"); muatGaji();
-  });
-
-  muatGaji();
 }
 
 async function muatGaji(){
@@ -1592,55 +1740,20 @@ async function muatGaji(){
       <td class="kanan">${rp(r.kasbon)}</td>
       <td class="kanan saldo-sel">${rp(r.total)}</td>
       <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
-  pasangUbah("gaji", data, BIDANG.gaji, muatGaji, "Ubah data gaji");
+  pasangUbah("gaji", data, muatGaji, "Ubah data gaji");
   pasangHapus("gaji", muatGaji);
 }
 
 /* =====================================================================
    12. MANAJEMEN — STOCK OPNAME
    ===================================================================== */
-async function layarOpname(){
-  $("#layar").innerHTML = judul("Stock Opname", "Hasil pengecekan fisik barang di gudang.") + `
-  <div class="papan">
-    <div class="kepala-papan"><h3>Catatan opname</h3>
-      <button class="tombol kuning" id="btnBuka">Tambah catatan</button></div>
-    <div class="form-tambah" id="formTambah">
-      <div class="kisi">
-        <div><label>Nomor</label><input id="oNomor" class="isian num" type="number" min="1"></div>
-        <div><label>Tanggal</label><input id="oTgl" class="isian" type="date" value="${hariIni()}"></div>
-        <div style="grid-column:span 2"><label>Keterangan</label><input id="oKet" class="isian" placeholder="Apel Fuji 3 Kg lembek"></div>
-        <div><label>Kondisi</label>
-          <select id="oKondisi" class="isian"><option>Baik</option><option>Rusak</option></select></div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="tombol biru" id="btnSimpan">Simpan catatan</button>
-        <button class="tombol garis" id="btnBatal">Batal</button>
-      </div>
-    </div>
-    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
-  </div>`;
-
-  const form=$("#formTambah");
-  $("#btnBuka").addEventListener("click", async () => {
-    form.classList.toggle("buka");
-    if(form.classList.contains("buka")){
-      const { data } = await sb.from("stock_opname").select("nomor").order("nomor",{ascending:false}).limit(1);
-      $("#oNomor").value = data&&data.length ? Number(data[0].nomor)+1 : 1;
-      $("#oKet").focus();
-    }
+function layarOpname(){
+  return layarDenganForm({
+    tabel:"stock_opname", judul:"Stock Opname",
+    ket:"Hasil pengecekan fisik barang di gudang.",
+    judulPapan:"Catatan opname", labelTambah:"Tambah catatan", labelSimpan:"Simpan catatan",
+    muat:muatOpname
   });
-  $("#btnBatal").addEventListener("click",()=>form.classList.remove("buka"));
-  $("#btnSimpan").addEventListener("click", async () => {
-    if(!$("#oKet").value.trim()) return toast("Keterangan belum diisi.","gagal");
-    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
-    const { error } = await sb.from("stock_opname").insert({
-      nomor:+$("#oNomor").value||1, tanggal:$("#oTgl").value||hariIni(),
-      keterangan:$("#oKet").value.trim(), kondisi:$("#oKondisi").value });
-    b.disabled=false; b.textContent="Simpan catatan";
-    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
-    toast("Catatan tersimpan"); form.classList.remove("buka"); $("#oKet").value=""; muatOpname();
-  });
-  muatOpname();
 }
 
 async function muatOpname(){
@@ -1653,51 +1766,20 @@ async function muatOpname(){
       <td class="num">${r.nomor}</td><td>${tglIndo(r.tanggal)}</td><td>${aman(r.keterangan)}</td>
       <td><span class="lencana ${r.kondisi==="Baik"?"baik":"rusak"}">${r.kondisi}</span></td>
       <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td></tr>`).join("") + `</tbody></table>`;
-  pasangUbah("stock_opname", data, BIDANG.stock_opname, muatOpname, "Ubah catatan opname");
+  pasangUbah("stock_opname", data, muatOpname, "Ubah catatan opname");
   pasangHapus("stock_opname", muatOpname);
 }
 
 /* =====================================================================
    13. MANAJEMEN — STOCK BUAH
    ===================================================================== */
-async function layarStokBuah(){
-  $("#layar").innerHTML = judul("Stock Buah",
-    "Daftar ini sekaligus menjadi pilihan buah di layar kasir. Apa yang dihapus di sini hilang juga dari kasir.") + `
-  <div class="papan">
-    <div class="kepala-papan"><h3>Persediaan</h3>
-      <button class="tombol kuning" id="btnBuka">Tambah jenis</button></div>
-    <div class="form-tambah" id="formTambah">
-      <div class="kisi">
-        <div><label>Jenis buah</label><input id="bNama" class="isian" placeholder="Durian Montong"></div>
-        <div><label>Jumlah</label><input id="bJumlah" class="isian num" type="number" min="0" step="0.5" value="0"></div>
-        <div><label>Satuan</label>
-          <select id="bSatuan" class="isian"><option>Kg</option><option>Pcs</option><option>Peti</option><option>Ikat</option></select></div>
-        <div><label>Harga jual per satuan</label><input id="bHarga" class="isian num uang" type="text" value="0"></div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="tombol biru" id="btnSimpan">Simpan jenis</button>
-        <button class="tombol garis" id="btnBatal">Batal</button>
-      </div>
-    </div>
-    <div class="gulung" id="isiTabel"><div class="memuat">Memuat…</div></div>
-  </div>`;
-
-  siapkanUang();
-  const form=$("#formTambah");
-  $("#btnBuka").addEventListener("click",()=>{ form.classList.toggle("buka"); if(form.classList.contains("buka")) $("#bNama").focus(); });
-  $("#btnBatal").addEventListener("click",()=>form.classList.remove("buka"));
-  $("#btnSimpan").addEventListener("click", async () => {
-    if(!$("#bNama").value.trim()) return toast("Nama buah belum diisi.","gagal");
-    const b=$("#btnSimpan"); b.disabled=true; b.textContent="Menyimpan…";
-    const { error } = await sb.from("stock_buah").insert({
-      jenis_buah:$("#bNama").value.trim(), jumlah:+$("#bJumlah").value||0,
-      satuan:$("#bSatuan").value, harga:uang("#bHarga"), aktif:true });
-    b.disabled=false; b.textContent="Simpan jenis";
-    if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
-    toast("Jenis buah ditambahkan"); form.classList.remove("buka");
-    $("#bNama").value=""; $("#bJumlah").value=0; $("#bHarga").value="0"; muatStokBuah();
+function layarStokBuah(){
+  return layarDenganForm({
+    tabel:"stock_buah", judul:"Stock Buah",
+    ket:"Daftar ini sekaligus menjadi pilihan buah di layar kasir. Apa yang dihapus di sini hilang juga dari kasir.",
+    judulPapan:"Persediaan", labelTambah:"Tambah jenis", labelSimpan:"Simpan jenis",
+    muat:muatStokBuah
   });
-  muatStokBuah();
 }
 
 async function muatStokBuah(){
@@ -1736,7 +1818,7 @@ async function muatStokBuah(){
     if(error) return toast("Gagal menyimpan: "+error.message,"gagal");
     toast("Baris diperbarui"); muatStokBuah();
   }));
-  pasangUbah("stock_buah", data, BIDANG.stock_buah, muatStokBuah, "Ubah jenis buah");
+  pasangUbah("stock_buah", data, muatStokBuah, "Ubah jenis buah");
   pasangHapus("stock_buah", muatStokBuah);
 }
 
@@ -1806,7 +1888,7 @@ async function muatDataKasir(){
       <td style="text-align:right"><button class="aksi-mini ubah-baris" data-id="${r.id}">Ubah</button><button class="hapus" data-id="${r.id}">Hapus</button></td>
     </tr>`).join("") + `</tbody></table>`;
 
-  pasangUbah(tabel, baris, BIDANG[tabel], muatDataKasir,
+  pasangUbah(tabel, baris, muatDataKasir,
     jual ? "Ubah transaksi penjualan" : "Ubah pengeluaran");
   pasangHapus(tabel, muatDataKasir);
 }
@@ -2006,7 +2088,7 @@ function gambarLonceng(){
 
 async function muatNotifikasi(){
   const { data } = await sb.from("notifikasi").select("*")
-    .order("created_at",{ascending:false}).limit(50);
+    .order("created_at",{ascending:false}).limit(100);
   daftarNotif = data || [];
   gambarLonceng();
 }
@@ -2022,6 +2104,7 @@ function mulaiNotifikasi(){
       if(n.untuk_role !== profil.role) return;
       daftarNotif.unshift(n);
       gambarLonceng();
+      if($("#daftarNotifIsi")){ gambarInfoNotif(); gambarDaftarNotif(); }
       tampilkanNotifikasi(n);
     })
     .subscribe();
@@ -2088,29 +2171,85 @@ function tawarkanIzinNotifikasi(){
   penyimpanan.setItem(KUNCI_NOTIF, "nanti");   // cukup ditawarkan sekali
 }
 
+const LANGKAH_NOTIF = 7;
+let batasNotif = LANGKAH_NOTIF;
+
+function waktuNotif(n){
+  return new Date(n.created_at).toLocaleString("id-ID",
+    {day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+}
+
+function gambarInfoNotif(){
+  const belum = jumlahBelumDibaca();
+  const info = $("#infoNotif"), tombol = $("#btnTandaiNotif");
+  if(info) info.innerHTML = belum
+    ? `<strong>${belum}</strong> belum dibaca · ${daftarNotif.length} total`
+    : `Semua sudah dibaca · ${daftarNotif.length} total`;
+  if(tombol) tombol.disabled = belum === 0;
+}
+
+function gambarDaftarNotif(){
+  const wadah = $("#daftarNotifIsi"); if(!wadah) return;
+  const tampil = daftarNotif.slice(0, batasNotif);
+  const sisa = daftarNotif.length - tampil.length;
+
+  wadah.innerHTML = tampil.map(n => `
+    <button class="notif ${n.dibaca ? "" : "baru"}" data-notif="${n.id}">
+      <div class="nj">${aman(n.judul)}</div>
+      <div class="np">${aman(isiNotif(n))}</div>
+      <div class="nw">${waktuNotif(n)}</div>
+    </button>`).join("") +
+    (sisa > 0 ? `<button class="lebih-notif" id="btnNotifLain">
+       Lihat ${Math.min(sisa, LANGKAH_NOTIF)} notifikasi lainnya</button>` : "");
+
+  wadah.querySelectorAll("[data-notif]").forEach(b =>
+    b.addEventListener("click", () => bukaSatuNotif(b.dataset.notif)));
+  const lain = $("#btnNotifLain");
+  if(lain) lain.addEventListener("click", () => {
+    batasNotif += LANGKAH_NOTIF;
+    gambarDaftarNotif();
+  });
+}
+
+function bukaSatuNotif(id){
+  const n = daftarNotif.find(x => String(x.id) === String(id));
+  if(!n) return;
+  if(!n.dibaca){
+    n.dibaca = true;
+    gambarLonceng();
+    sb.from("notifikasi").update({ dibaca:true }).eq("id", n.id).then(() => {});
+  }
+  tutupModal();
+  buka(n.jenis === "pengeluaran" ? "pengeluaran_m" : "penjualan_m");
+}
+
 function bukaPanelNotifikasi(){
+  batasNotif = LANGKAH_NOTIF;
   const izin = ("Notification" in window) ? Notification.permission : "tidak-ada";
-  const kepala = izin === "granted" ? "" : `
+
+  // Bilah atas: selalu terlihat walau daftar di-scroll
+  const bilah = daftarNotif.length ? `
+    <div class="bilah-notif">
+      <span class="info" id="infoNotif">—</span>
+      <button class="aksi-mini" id="btnTandaiNotif" style="margin:0">Tandai semua dibaca</button>
+    </div>` : "";
+
+  const pesanIzin = izin === "granted" ? "" : `
     <div class="pesan tampil info" style="margin-bottom:16px">
       ${izin === "denied"
         ? "Notifikasi diblokir di browser ini. Buka pengaturan situs lalu izinkan notifikasi."
         : "Notifikasi HP belum aktif."}
-      ${izin === "default" ? `<div><button class="tombol kuning" id="btnIzinNotif"
-         style="margin-top:10px;padding:8px 14px;font-size:13px">Aktifkan notifikasi</button></div>` : ""}
+      ${izin === "default" ? `<div><button class="tombol kuning kecil" id="btnIzinNotif"
+         style="margin-top:10px">Aktifkan notifikasi</button></div>` : ""}
     </div>`;
 
-  const isi = kepala + (daftarNotif.length ? `
-    <div class="daftar-notif">` + daftarNotif.map(n => `
-      <div class="notif ${n.dibaca ? "" : "baru"}">
-        <div class="nj">${aman(n.judul)}</div>
-        <div class="np">${aman(isiNotif(n))}</div>
-        <div class="nw">${new Date(n.created_at).toLocaleString("id-ID",
-          {day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
-      </div>`).join("") + `</div>
-    <button class="tombol garis" id="btnTandaiNotif" style="margin-top:8px;width:100%">Tandai semua sudah dibaca</button>`
+  const isi = bilah + pesanIzin + (daftarNotif.length
+    ? `<div class="daftar-notif" id="daftarNotifIsi"></div>`
     : kosong("Belum ada notifikasi","Catatan baru dari kasir akan muncul di sini."));
 
   bukaModal("Notifikasi", isi, null);
+  gambarInfoNotif();
+  gambarDaftarNotif();
 
   const bIzin = $("#btnIzinNotif");
   if(bIzin) bIzin.addEventListener("click", async () => {
@@ -2120,10 +2259,13 @@ function bukaPanelNotifikasi(){
 
   const bTandai = $("#btnTandaiNotif");
   if(bTandai) bTandai.addEventListener("click", async () => {
+    bTandai.disabled = true;
     const { error } = await sb.from("notifikasi").update({ dibaca:true }).eq("dibaca", false);
-    if(error) return toast("Gagal menandai: "+error.message,"gagal");
+    if(error){ bTandai.disabled = false; return toast("Gagal menandai: "+error.message,"gagal"); }
     daftarNotif = daftarNotif.map(n => ({ ...n, dibaca:true }));
-    gambarLonceng(); bukaPanelNotifikasi();
+    gambarLonceng();
+    gambarInfoNotif();
+    gambarDaftarNotif();       // jumlah yang sedang dibuka tetap dipertahankan
   });
 }
 

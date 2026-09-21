@@ -1,4 +1,4 @@
-# buahmurah.id — Ringkasan Proyek (v5)
+# buahmurah.id — Ringkasan Proyek (v7)
 
 > Berkas ini dibuat untuk dilampirkan ke percakapan Claude yang baru supaya pengerjaan
 > bisa dilanjutkan tanpa mengulang penjelasan dari nol. Lampirkan file ini bersama
@@ -120,7 +120,7 @@ Struktur folder di hosting harus **persis seperti di atas** — `index.html` mem
 | `pengeluaran` | tanggal, keterangan, nominal, user_id | sama seperti penjualan |
 | `cashflow` | nomor, tanggal, keterangan, debit, kredit, bukti_url | khusus manajemen |
 | `kulakan` | nomor, tanggal, keterangan, jumlah, satuan, harga, bukti_url | khusus manajemen |
-| `gaji` | nomor, nama, bulan, absensi, total_hari, kasbon, total | khusus manajemen |
+| `gaji` | nomor, nama, bulan, absensi, total_hari, upah_harian, kasbon, total | khusus manajemen |
 | `stock_opname` | nomor, tanggal, keterangan, kondisi | khusus manajemen |
 | `notifikasi` | judul, pesan, jenis, nominal, untuk_role, ref_tabel, ref_id, dari_nama, dibaca | dibaca oleh role tujuan saja |
 
@@ -185,10 +185,30 @@ kasir" semuanya bisa diedit langsung di tabel. Layar kasir membaca daftar buah d
 lengkap dengan sisa stok di tiap pilihan — jadi tidak ada lagi buah yang muncul di kasir
 tapi sudah dihapus manajemen.
 
-**Ubah baris.** Semua tabel manajemen punya tombol Ubah per baris: cashflow, kulakan,
-gaji, stock opname, stock buah, serta data penjualan dan pengeluaran dari kasir. Formnya
-dibangun otomatis dari `BIDANG[tabel]`, jadi menambah kolom yang bisa diedit cukup dengan
-menambah satu entri di sana.
+**Form bersama Tambah & Ubah.** Setiap tabel manajemen punya satu definisi di
+`FORM[tabel]`, dan definisi itu dipakai oleh form Tambah (panel di atas tabel) maupun form
+Ubah (modal dari tombol Ubah per baris). Jadi isiannya dijamin identik — sudah diuji
+otomatis untuk cashflow, kulakan, gaji, stock opname, dan stock buah. Menambah kolom cukup
+dengan menambah satu entri di `FORM`.
+
+Jenis isian yang didukung: `teks` (bisa `saran:"buah"` untuk datalist stok), `tanggal`,
+`bulan`, `angka`, `uang`, `pilih`, `cek`, `pilihBuah` (dropdown dari stok, mengisi satuan
+dan harga), `bayar` (tombol Cash/Transfer), `total` (tampilan hitung langsung lewat
+`rumus`), dan `bukti`. Opsi tambahan: `wajib`, `lebihDariNol`, `lebar`, `bawaan`,
+`nomorOtomatis`, `tampilJika(v)`, serta `otomatis(v)` + `dari:[...]` untuk isian yang
+dihitung ulang saat isian lain berubah (dipakai total gaji).
+
+Isian `bukti` di form Ubah menampilkan pratinjau bukti lama, kotak centang **Hapus bukti
+ini**, dan tombol Ambil foto / Pilih berkas untuk menggantinya. Aturan simpannya: ada
+berkas baru → diunggah dan menggantikan; dicentang hapus → `null`; tidak disentuh →
+kolom tidak ikut dikirim sehingga bukti lama tetap; bukti tersembunyi oleh `tampilJika`
+(misalnya penjualan diganti ke Cash) → `null`.
+
+Data Penjualan dan Data Pengeluaran juga punya definisi di `FORM` yang meniru layar kasir,
+jadi manajemen mengubahnya dengan isian yang sama seperti saat kasir mencatat.
+
+Fungsi inti: `htmlForm`, `pasangForm`, `bacaForm`, `nilaiAwal`, `ubahDenganForm`,
+`layarDenganForm`, `pasangUbah(tabel, data, muatUlang, judul)`.
 
 **Stok otomatis.** Trigger `on_penjualan_stok` memotong `stock_buah.jumlah` setiap kali
 kasir menyimpan penjualan, mengembalikannya saat baris dihapus, dan menghitung selisihnya
@@ -201,6 +221,17 @@ ketika pencatatan stok belum rapi.
 komponen filter yang sama: Hari ini, Kemarin, 7 hari, Bulan ini, dan Rentang tanggal.
 Bawaannya Hari ini. Fungsinya `buatFilter()`, `kotakFilter(pre)`, `pasangFilter(pre, st,
 muatUlang)`, dan `labelRentang(st)`.
+
+**Panel notifikasi.** Bilah berisi jumlah belum dibaca dan tombol "Tandai semua dibaca"
+menempel di atas panel (`position:sticky`), jadi tidak perlu scroll ke bawah. Daftar
+menampilkan 7 notifikasi, lalu tombol "Lihat N notifikasi lainnya" menambah 7 lagi setiap
+diklik (hingga 100 yang dimuat). Mengetuk satu notifikasi menandainya sudah dibaca dan
+langsung membuka Data Penjualan atau Data Pengeluaran. Konstanta: `LANGKAH_NOTIF = 7`.
+
+**Tata letak HP.** Semua grid memakai `minmax(0,1fr)`, bukan `1fr`, supaya dropdown dengan
+nama buah panjang tidak memaksa halaman melebar. Semua isian bertulisan 16px di layar ≤960px
+supaya Safari iPhone tidak memperbesar layar saat isian disentuh. Tanggal di header memakai
+format pendek di layar sempit. Sudah diuji tanpa geser samping di lebar 360 dan 390 piksel.
 
 **Header dan navigasi.** Setiap halaman punya header berisi sapaan dengan nama yang login,
 tanggal dan jam berjalan (diperbarui tiap detik), lonceng notifikasi, dan avatar bundar
@@ -245,8 +276,10 @@ memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke do
   angka penting, bukan hiasan.
 - Font Plus Jakarta Sans, angka memakai `font-variant-numeric: tabular-nums`.
 - Sidebar di layar lebar, tab bawah di layar ≤960px, padding `env(safe-area-inset-*)`.
+- Kolom grid selalu `minmax(0,1fr)`; isian di HP minimal 16px. Melanggar salah satunya
+  membuat layar HP melebar atau ter-zoom.
 - **Naikkan angka `VERSI` di `sw.js` setiap kali `index.html` diubah**, kalau tidak HP
-  akan tetap membuka versi lama dari cache. Sekarang bernilai `buahmurah-v4`.
+  akan tetap membuka versi lama dari cache. Sekarang bernilai `buahmurah-v6`.
 
 ---
 
@@ -262,11 +295,14 @@ memakai network-first untuk halaman dan cache-first untuk aset; permintaan ke do
 5. **Edit baris pembukuan.** Cashflow, kulakan, gaji, dan opname hanya bisa ditambah dan
    dihapus, belum bisa diedit.
 6. **Kolom `profiles.aktif`** sudah ada tapi belum dipakai untuk menonaktifkan akun.
-7. **Antrean offline.** Aplikasi tetap terbuka tanpa sinyal, tapi menyimpan transaksi
+7. **Berkas bukti lama tidak ikut terhapus dari Storage** saat diganti atau dihapus —
+   hanya tautannya yang dilepas dari baris. Perlu policy delete di `storage.objects`
+   plus pemanggilan `remove()` kalau ingin benar-benar bersih.
+8. **Antrean offline.** Aplikasi tetap terbuka tanpa sinyal, tapi menyimpan transaksi
    masih butuh internet.
-8. **Pencarian teks** pada tabel data belum ada (filter tanggal sudah). Hasil query
+9. **Pencarian teks** pada tabel data belum ada (filter tanggal sudah). Hasil query
    dibatasi 300–500 baris per rentang.
-9. **Cashflow dan Kulakan belum berfilter tanggal** — keduanya masih menampilkan seluruh
+10. **Cashflow dan Kulakan belum berfilter tanggal** — keduanya masih menampilkan seluruh
    buku karena saldo berjalan perlu dihitung dari awal.
 
 ---

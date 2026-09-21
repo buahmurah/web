@@ -1,5 +1,5 @@
 -- =====================================================================
--- buahmurah.id — Skema Supabase v5
+-- buahmurah.id — Skema Supabase v6
 -- Project: https://uuorhkhpubkvsilsybvw.supabase.co
 --
 -- Jalankan SELURUH isi berkas ini di Supabase Dashboard > SQL Editor > Run.
@@ -281,6 +281,9 @@ create table if not exists public.gaji (
   total      numeric(14,2) not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- v6: upah per hari disimpan, supaya form Ubah bisa menampilkannya lagi
+alter table public.gaji add column if not exists upah_harian numeric(14,2) not null default 0;
 
 create table if not exists public.stock_opname (
   id         bigint generated always as identity primary key,
